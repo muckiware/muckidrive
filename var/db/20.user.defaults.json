@@ -1,0 +1,14 @@
+[
+    {
+        "table": "core_users",
+        "name": "system",
+        "eMail": "system@local.com",
+        "userName": "system",
+        "firstName": null,
+        "lastName": null,
+        "password": "password",
+        "isActive": true,
+        "isSystemUser": true,
+        "languageId": 1
+    }
+]

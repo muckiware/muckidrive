@@ -1,0 +1,22 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "projects": {
+    "appmodules": {
+      "type": "library",
+      "root": "app_modules",
+      "entryFile": "index",
+      "sourceRoot": "app_modules/src",
+      "compilerOptions": {
+        "tsConfigPath": "app_modules/tsconfig.appmodules.json"
+      }
+    }
+  },
+  "compilerOptions": {
+    "assets": [
+      "var/etc/**/*"
+    ],
+    "deleteOutDir": false,
+    "webpack": false
+  }
+}

@@ -1,0 +1,28 @@
+[
+    {
+        "table": "core_languages",
+        "name": "English - United States",
+        "description": "",
+        "isActive": true,
+        "isDefault": true,
+        "code": "en",
+        "codeLong": "en-US",
+        "codeLocale": "en",
+        "codeCulture": "0x0409",
+        "Iso639xValue": "ENU",
+        "createUserId": 1
+    },
+    {
+        "table": "core_languages",
+        "name": "English - United Kingdom",
+        "description": "",
+        "isActive": true,
+        "isDefault": false,
+        "code": "en",
+        "codeLong": "en-GB",
+        "codeLocale": "en",
+        "codeCulture": "0x0809",
+        "Iso639xValue": "ENU",
+        "createUserId": 1
+    }
+]
