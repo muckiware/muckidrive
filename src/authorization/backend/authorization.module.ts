@@ -46,7 +46,7 @@ export class AuthorizationBackendModule implements OnModuleInit {
                 name: 'AuthorizationBackendModule',
                 description: 'Module for to authorization backend users by rules',
                 moduleVersion: '1.0.0',
-                vendor: 'smoppit',
+                vendor: 'muckiware',
                 license: 'MIT'
             }
         );

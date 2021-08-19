@@ -2,7 +2,7 @@
  * @package     muckiwareDrive
  * @subpackage  Server
  *
- * @copyright Copyright (C) 2021 by smoppit. All rights reserved.
+ * @copyright Copyright (C) 2021 by muckiware. All rights reserved.
  * @license MIT
  * @link https://github.com/muckiware/muckidrive
  */
@@ -15,6 +15,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database.module'
 import configuration from './config/configuration';
 import { BasicsModule } from './basics/basics.module';
+import { GraphQLApiModule } from './graphql/graphql.module';
 import { HelperPathTools } from './helper';
 
 import { 
@@ -37,7 +38,7 @@ const loaderInstance = LoaderModule.getInstance();
         }),
         DatabaseModule.registerDatabaseModuleAsync(),
         BasicsModule,
-        // TODO / To Check orwardRef(() => CoreModule),
+        GraphQLApiModule,
         AuthenticationBackendModule,
         AuthorizationBackendModule,
         TypeOrmModule.forFeature([LoaderModel]),
@@ -54,6 +55,7 @@ const loaderInstance = LoaderModule.getInstance();
         ConfigModule,
         DatabaseModule,
         BasicsModule,
+        GraphQLApiModule,
         LoaderService,
         LoaderResolver,
         HelperPathTools

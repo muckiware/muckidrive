@@ -7,6 +7,4 @@
  * @link https://github.com/muckiware/muckidrive
  */
 
-export * from './basics.module';
-export * from './models';
-export * from './services';
+export * from './graphql.module'
