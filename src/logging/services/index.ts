@@ -7,6 +7,4 @@
  * @link https://github.com/muckiware/muckidrive
  */
 
-export * from './loader.model';
-export * from './config.model';
-export * from './loader.dto';
+export * from './logger.service';

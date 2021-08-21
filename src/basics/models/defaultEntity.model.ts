@@ -30,9 +30,14 @@ export class DefaultEntityTables {
     public static readonly TABLE_LANGUAGES = 'core_languages';
 
     /**
-     * Existing and loaded modules
+     * table for modules
      */
     public static readonly TABLE_MODULES = 'core_modules';
+
+    /**
+     * table for module config items
+     */
+     public static readonly TABLE_MODULES_CONFIG = 'core_modules_config';
 
     /**
      * Existing stores

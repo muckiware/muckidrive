@@ -22,6 +22,7 @@ import { HelperPathTools } from './helper';
 import { 
     LoaderModule,
     LoaderModel,
+    ConfigModel,
     LoaderService,
     LoaderResolver
 } from './loader';
@@ -43,7 +44,7 @@ const loaderInstance = LoaderModule.getInstance();
         GraphQLApiModule,
         AuthenticationBackendModule,
         AuthorizationBackendModule,
-        TypeOrmModule.forFeature([LoaderModel]),
+        TypeOrmModule.forFeature([LoaderModel, ConfigModel]),
         loaderInstance.registerModules(),
         InitModule
     ],

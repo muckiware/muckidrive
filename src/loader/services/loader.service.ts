@@ -2,7 +2,7 @@
  * @package     muckiwareDrive
  * @subpackage  Server
  *
- * @copyright Copyright (C) 2021 by smoppit. All rights reserved.
+ * @copyright Copyright (C) 2021 by muckiware. All rights reserved.
  * @license MIT
  * @link https://github.com/muckiware/muckidrive
  */
@@ -85,6 +85,10 @@ export class LoaderService {
     public async findModuleByName(moduleName: string): Promise<LoaderModel> {
 
         let result =  await this.loaderRepository.findOne({
+
+            relations: [
+                'config',
+            ],
             where:  {
                 name: moduleName
             }
@@ -110,18 +114,25 @@ export class LoaderService {
     async findAll(entityPaginationInput: DefaultEntityPaginationInput = {}, withoutFilter: boolean = false): Promise<LoaderModel[]> {
 
         if(withoutFilter || lodash.isEmpty()) {
-            return this.loaderRepository.find();
+            return this.loaderRepository.find({
+
+                relations: [
+                    'config',
+                ]
+            });
         } else {
 
-            return this.loaderRepository.find(
-                {
-                    skip: entityPaginationInput.skip,
-                    take: entityPaginationInput.take,
-                    order: {
-                        [entityPaginationInput.orderField]: entityPaginationInput.sortDirection
-                    }
+            return this.loaderRepository.find({
+
+                relations: [
+                    'config',
+                ],
+                skip: entityPaginationInput.skip,
+                take: entityPaginationInput.take,
+                order: {
+                    [entityPaginationInput.orderField]: entityPaginationInput.sortDirection
                 }
-            );
+            });
         }
     }
 

@@ -8,7 +8,7 @@
  */
 
 import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerService } from './logger.service';
+import { LoggerService } from './services';
 
 import * as path from 'path';
 import { HelperFileTools } from '@muckidrive/helper';
