@@ -16,6 +16,7 @@ import { DatabaseModule } from './database.module'
 import configuration from './config/configuration';
 import { BasicsModule } from './basics/basics.module';
 import { GraphQLApiModule } from './graphql/graphql.module';
+import { LoggerModule } from './logging/logger.module';
 import { HelperPathTools } from './helper';
 
 import { 
@@ -38,6 +39,7 @@ const loaderInstance = LoaderModule.getInstance();
         }),
         DatabaseModule.registerDatabaseModuleAsync(),
         BasicsModule,
+        LoggerModule,
         GraphQLApiModule,
         AuthenticationBackendModule,
         AuthorizationBackendModule,
@@ -55,6 +57,7 @@ const loaderInstance = LoaderModule.getInstance();
         ConfigModule,
         DatabaseModule,
         BasicsModule,
+        LoggerModule,
         GraphQLApiModule,
         LoaderService,
         LoaderResolver,
