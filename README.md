@@ -55,6 +55,31 @@ auth:
 ```
 
 # Usage
+## Module configurations
+Each module can save and can unlimit key/value pairs. It will saved in a database table and served of a cached storage.
+```JAVASCRIPT
+import { Injectable } from '@nestjs/common';
+import { ModuleConfigService } from '@muckidrive/config';
+
+import { MyCustomModule } from 'my.custom.module.ts';
+
+@Injectable()
+export class MyCustomService  {
+
+  constructor(
+    ...
+    private readonly moduleConfigService: ModuleConfigService
+    ...
+  ) { }
+
+  public myExampleGetConfg() {
+
+    return this.moduleConfigService.getValueByKey(MyCustomModule.name, 'key', 'defaultValue');
+  }
+}
+```
+
+The value can be typed with string, number, float or boolean. 
 ## loggings
 For to create logging items in your modules, offers muckidrive an logging service as interface. This service creates logging files into the subfolder var/log. It will use log rotation by configure the maximun number of files and file size of earch log. 
 

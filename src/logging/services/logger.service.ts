@@ -14,8 +14,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { LoggerModule, LoggerServiceInterface } from '../index';
-import { ModuleConfigService } from '../../config';
-
+import { ModuleConfigService } from '@muckidrive/config';
 import { HelperFileTools } from '@muckidrive/helper';
 @Injectable()
 export class LoggerService implements LoggerServiceInterface {
