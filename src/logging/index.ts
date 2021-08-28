@@ -7,5 +7,5 @@
  * @link https://github.com/muckiware/muckidrive
  */
 
-export * from './logger.service';
-export * from './logger.service.interface';
+export * from './logger.module';
+export * from './services';

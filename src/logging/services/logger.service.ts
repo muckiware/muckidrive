@@ -13,79 +13,184 @@ import * as log4js from 'log4js'
 import * as fs from 'fs';
 import * as path from 'path';
 
-@Injectable()
-export class LoggerService {
+import { LoggerModule, LoggerServiceInterface } from '../index';
+import { ModuleConfigService } from '../../config';
 
-    CONFIG_PATH: string = '/var/etc/log.conf.json';
+import { HelperFileTools } from '@muckidrive/helper';
+@Injectable()
+export class LoggerService implements LoggerServiceInterface {
+
+    CONFIG_PATH: string = '/var/etc';
+
     private _logger: log4js.Logger;
 
-    constructor() {
+    constructor(
+        private readonly moduleConfigService: ModuleConfigService
+    ) { }
 
-        if(this._logger !== undefined) {
+    async trace(message: string, loggerContext = '', extensionContext = ''): Promise<void> {
 
-            let logPath: string = path.resolve() + this.CONFIG_PATH;
-            Logger.debug('logPath: is ' + logPath, 'logger');
-            Logger.debug('set logger config', 'logger');
-            try {
-                fs.mkdirSync('./var/log');
-            } catch (e) {
-                if (e.code != 'EEXIST') {
-                    Logger.error('Could not set up log directory, error was', 'logger');
-                    Logger.error(e, 'logger');
-                    process.exit(1);
+        if(await this.getModuleConfigValueByKey('enable')) {
+            if(this._setLoggerConfig(loggerContext, extensionContext)) {
+                this._logger.info(message);
+            }
+        }
+    }
+
+    async debug(message: string, loggerContext = '', extensionContext = ''): Promise<void> {
+
+        if(await this.getModuleConfigValueByKey('enable')) {
+            if(this._setLoggerConfig(loggerContext, extensionContext)) {
+
+                console.log('log message', message);
+                this._logger.debug(message);
+            }
+        }
+    }
+
+    async info(message: string, loggerContext = '', extensionContext = ''): Promise<void>{
+
+        if(await this.getModuleConfigValueByKey('enable')) {
+            if(this._setLoggerConfig(loggerContext, extensionContext)) {
+                this._logger.info(message);
+            }
+        }
+    }
+
+    async warn(message: string, loggerContext = '', extensionContext = ''): Promise<void> {
+
+        if(await this.getModuleConfigValueByKey('enable')) {
+            if(this._setLoggerConfig(loggerContext, extensionContext)) {
+                this._logger.warn(message);
+            }
+        }
+    }
+
+    async error(message: string, loggerContext = '', extensionContext = ''): Promise<void> {
+
+        if(await this.getModuleConfigValueByKey('enable')) {
+            if(this._setLoggerConfig(loggerContext, extensionContext)) {
+                this._logger.error(message);
+            }
+        }
+    }
+
+    async fatal(message: string, loggerContext = '', extensionContext = ''): Promise<void> {
+
+        if(await this.getModuleConfigValueByKey('enable')) {
+            if(this._setLoggerConfig(loggerContext, extensionContext)) {
+                this._logger.fatal(message);
+            }
+        }
+    }
+
+    public getModuleConfigValueByKey(key: string, defaultValue: any = null) {
+        return this.moduleConfigService.getValueByKey(LoggerModule.name, key, defaultValue);
+    }
+
+    protected async _setLoggerConfig(loggerContext: string, extensionContext: string): Promise<boolean> {
+
+        let configFilePath: string = this._getConfigPath(loggerContext, extensionContext);
+
+        if(this._checkConfigPath(configFilePath, loggerContext, extensionContext)) {
+
+            log4js.configure(configFilePath);
+            this._logger = log4js.getLogger(loggerContext + extensionContext);
+        }
+
+        return false;
+    }
+
+    protected _getConfigPath(loggerContext: string = '', extensionContext: string = ''): string {
+
+        let logPath: string = path.resolve() + this.CONFIG_PATH;
+
+        switch (true) {
+            case (loggerContext !== '' && extensionContext !== ''):
+                return logPath + '/logconfig.' + extensionContext + '.' + loggerContext + '.json';
+            case (loggerContext !== '' && extensionContext == ''):
+                return logPath + '/logconfig.' + loggerContext + '.json';
+            case (loggerContext == '' && extensionContext !== ''):
+                return logPath + '/logconfig.' + extensionContext + '.json';
+            default:
+                return logPath + '/logconfig.json';
+        }
+    }
+
+    protected _getLoggerFileName(loggerContext = '', extensionContext = ''): string {
+        
+        let logPath = path.resolve() + '/var/log';
+        switch (true) {
+            case (loggerContext !== '' && extensionContext !== ''):
+                return logPath + '/' + extensionContext + '.' + loggerContext + '.log';
+            case (loggerContext !== '' && extensionContext == ''):
+                return logPath + '/muckidrive.' + loggerContext + '.log';
+            case (loggerContext == '' && extensionContext !== ''):
+                return logPath + '/' + extensionContext + '.log';
+            default:
+                return logPath + '/muckidrive.log';
+        }
+    }
+
+    protected _checkConfigPath(configFilePath: string, loggerContext: string = '', extensionContext: string = ''): boolean {
+
+        if(this._checkConfigFile(configFilePath, loggerContext, extensionContext)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected _checkConfigFile($path: string, $loggerContext: string = '', $extensionContext: string = '') {
+        
+        if(fs.existsSync($path)) {
+            return true;
+        } else {
+
+            this._createConfigJson($path, $loggerContext, $extensionContext);
+            
+            if(fs.existsSync($path)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    protected async _createConfigJson(path: string, loggerContext: string, extensionContext: string) {
+
+        HelperFileTools.saveObjectByNewFile(
+            path,
+            {
+                "appenders": {
+                    out: {
+                        type: "stdout",
+                        layout: { 
+                            type: 'basic'
+                        }
+                    },
+                    [loggerContext + extensionContext]: {
+                        type: "file",
+                        layout: {
+                            type: 'pattern',
+                            pattern: '%d level: %p, message: %m'
+                        },
+                        filename: this._getLoggerFileName(loggerContext, extensionContext),
+                        backups: await this.getModuleConfigValueByKey('max_files', 5),
+                        maxLogSize: await this.getModuleConfigValueByKey('max_size', 5) * 1024 * 1024
+                    }
+                },
+                categories: {
+                    default: {
+                        appenders: [
+                            "out",
+                            loggerContext + extensionContext
+                        ],
+                        level: await this.getModuleConfigValueByKey('loglevel', 'info'),
+                        enableCallStack: true
+                    }
                 }
             }
-
-            try {
-                JSON.parse(
-                    this.getTextFileContent(
-                      logPath.replace(/\//g, "\\")
-                    )
-                );
-            } catch (e) {
-                Logger.error(logPath.replace(/\//g, "\\"), 'is not a valid json file!', 'logger');
-                Logger.error(e, 'logger');
-                process.exit(1);
-            }
-
-            log4js.configure(logPath);
-            this._logger = log4js.getLogger();
-        }
-    }
-
-    private getTextFileContent(file: string): string {
-
-        try {  
-            var data = fs.readFileSync(file, 'utf8');
-            return data.toString();
-        } catch(e) {
-            console.log('Error read text file:', file);
-            console.log(e.stack);
-            return '';
-        }
-    }
-
-    trace(message: string): void {
-        this._logger.trace(message);
-    }
-
-    debug(message: string): void {
-        this._logger.debug(message);
-    }
-
-    info(message: string): void {
-        this._logger.info(message);
-    }
-
-    warn(message: string): void {
-        this._logger.warn(message);
-    }
-
-    error(message: string): void {
-        this._logger.error(message);
-    }
-
-    fatal(message: string): void {
-        this._logger.fatal(message);
+        );
     }
 }

@@ -7,16 +7,16 @@
  * @link https://github.com/muckiware/muckidrive
  */
 
-import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerService } from './services';
+import { Module, OnModuleInit, Global } from '@nestjs/common';
 
 import * as path from 'path';
 import { HelperFileTools } from '@muckidrive/helper';
 
+@Global()
 @Module({
     imports: [],
-    providers: [ LoggerService ],
-    exports: [ LoggerService ]
+    providers: [],
+    exports: []
 })
 export class LoggerModule implements OnModuleInit {
 
