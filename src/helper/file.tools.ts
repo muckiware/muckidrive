@@ -19,9 +19,13 @@ export class HelperFileTools {
     private static writeFileOptions = {mode: 0o0600};
     private static permissionError = 'No access to this file.';
 
-    public static saveObjectByNewFile(file: string, inputList: {}) {
+    public static saveObjectByNewFile(file: string, inputList: {} = {}) {
 
-        try {
+		if(file === '') {
+			throw new Error('Invalid input');
+		}
+
+		try {
 
 			// Make sure the folder exists as it could have been deleted in the meantime
 			mkdirp.sync(path.dirname(file), this.defaultPathMode);
@@ -79,6 +83,10 @@ export class HelperFileTools {
 	 */
 	public static getObjectByFile(file: string) {
 
+		if(file === '') {
+			throw new Error('Invalid input');
+		}
+
 		try {
 			return JSON.parse(fs.readFileSync(file, 'utf8'));
 		} catch (err) {
@@ -91,14 +99,13 @@ export class HelperFileTools {
 			// Improve the message of permission errors
 			if (err.code === 'EACCES') {
 				err.message = `${err.message}\n${this.permissionError}\n`;
+				throw new Error(err)
 			}
 
 			// Empty the file if it encounters invalid JSON
 			if (err.name === 'SyntaxError') {
 				writeFileAtomic.sync(file, '', this.writeFileOptions);
 			}
-
-			return {};
 		}
 	}
 
