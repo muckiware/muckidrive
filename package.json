@@ -112,7 +112,8 @@
     "testEnvironment": "node",
     "roots": [
       "<rootDir>/src/",
-      "<rootDir>/app_modules/"
+      "<rootDir>/app_modules/",
+      "<rootDir>/tests/"
     ],
     "moduleNameMapper": {
       "appmodules/app_modules/(.*)": "<rootDir>/app_modules/src/$1"
