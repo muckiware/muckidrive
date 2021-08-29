@@ -2,7 +2,7 @@
  * @package     muckiwareDrive
  * @subpackage  Server
  *
- * @copyright Copyright (C) 2021 by smoppit. All rights reserved.
+ * @copyright Copyright (C) 2021 by muckiware. All rights reserved.
  * @license MIT
  * @link https://github.com/muckiware/muckidrive
  */
@@ -21,7 +21,7 @@ import { LoaderService, LoaderModel, NewModuleInput } from '@muckidrive/loader';
 @Module({})
 export class InitModule implements OnApplicationBootstrap {
 
-    private _daultsArray: any;
+    private _defaultArray: any;
     private needLanguageDefaults: boolean;
     private needUserDefaults: boolean;
 
@@ -31,7 +31,7 @@ export class InitModule implements OnApplicationBootstrap {
         private readonly loaderService: LoaderService,
         private readonly basicsService: BasicsService
     ) {
-        this._daultsArray = new Array();
+        this._defaultArray = new Array();
         this.languagesService = languagesService;
         this.usersService = usersService;
         this.loaderService = loaderService;
@@ -99,12 +99,12 @@ export class InitModule implements OnApplicationBootstrap {
   
         HelperFileTools.findFilesByExtension(this.basicsService.getDefaultsPath(), 'defaults.json').forEach(filePath => {
 
-            this._daultsArray.push(
+            this._defaultArray.push(
                 HelperFileTools.getObjectByFile(filePath)
             );
         });
 
-        return Promise.all(this._daultsArray).then((allDefaultItems: any) => {
+        return Promise.all(this._defaultArray).then((allDefaultItems: any) => {
 
             allDefaultItems.forEach(async(defaultItems: any) => {
 

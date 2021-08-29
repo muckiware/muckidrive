@@ -20,8 +20,6 @@ import { LoaderModel } from './loader.model'
 @ObjectType()
 export class ConfigModel extends DefaultEntityModel {
 
-    // @Field()
-    // @Column({ unique: true })
     @ManyToOne(type => LoaderModel, (module) => module.id)
     module: number;
 

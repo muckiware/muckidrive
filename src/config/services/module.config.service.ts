@@ -13,12 +13,12 @@ import { Cache } from 'cache-manager'
 
 import { LoaderService, LoaderModel, ConfigModel } from '@muckidrive/loader'
 
-
 @Injectable()
 export class ModuleConfigService {
 
     constructor(
-        @Inject(CACHE_MANAGER) private cacheManager: Cache,
+        @Inject(CACHE_MANAGER)
+        private cacheManager: Cache,
         private readonly loaderService: LoaderService
     ) {}
 
