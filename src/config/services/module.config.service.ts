@@ -11,7 +11,8 @@
 import { Injectable, Inject, CACHE_MANAGER } from '@nestjs/common';
 import { Cache } from 'cache-manager'
 
-import { LoaderService, LoaderModel, ConfigModel } from '@muckidrive/loader'
+// import { LoaderService, LoaderModel, ConfigModel } from '@muckidrive/loader'
+import { LoaderService, LoaderModel, ConfigModel } from '../../loader';
 
 @Injectable()
 export class ModuleConfigService {

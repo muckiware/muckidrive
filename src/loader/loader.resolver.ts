@@ -12,7 +12,9 @@ import { UseGuards, SetMetadata } from '@nestjs/common';
 import { PubSub } from 'apollo-server-express';
 
 import { LoaderModel, LoaderService } from './index'
-import { DefaultEntityPaginationInput, UsersService, UsersModel } from '@muckidrive/basics'
+// import { DefaultEntityPaginationInput, UsersService, UsersModel } from '@muckidrive/basics';
+import { DefaultEntityPaginationInput, UsersService, UsersModel } from '../basics';
+
 import { JwtAuthenticationBackendGuard } from '../authentication/backend';
 import { 
     AuthorizationRolesGuard,

@@ -9,14 +9,17 @@
 
 import { Logger, Module, OnModuleInit, OnApplicationBootstrap } from '@nestjs/common';
 
-import { HelperFileTools } from '@muckidrive/helper';
-import {
-    LanguagesService,
-    UsersService,
-    UsersModel,
-    BasicsService
-} from '@muckidrive/basics';
-import { LoaderService, LoaderModel, NewModuleInput } from '@muckidrive/loader';
+// import { HelperFileTools } from '@muckidrive/helper';
+// import {
+//     LanguagesService,
+//     UsersService,
+//     UsersModel,
+//     BasicsService
+// } from '@muckidrive/basics';
+// import { LoaderService, LoaderModel, NewModuleInput } from '@muckidrive/loader';
+import { HelperFileTools } from '../helper';
+import { LanguagesService, UsersService, UsersModel, BasicsService } from '../basics';
+import { LoaderService, LoaderModel, NewModuleInput } from '../loader';
 
 @Module({})
 export class InitModule implements OnApplicationBootstrap {
@@ -35,6 +38,9 @@ export class InitModule implements OnApplicationBootstrap {
         this.languagesService = languagesService;
         this.usersService = usersService;
         this.loaderService = loaderService;
+
+        // Logger.debug('registerModules()');
+        // LoaderModule.getInstance().registerModules();
     }
 
     onApplicationBootstrap() {

@@ -11,7 +11,8 @@ import { Module, Global, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import * as path from 'path';
-import { HelperFileTools } from '@muckidrive/helper';
+// import { HelperFileTools } from '@muckidrive/helper';
+import { HelperFileTools } from '../../helper';
 import {
     AuthorizationBackendResolver,
     AuthorizationBackendService,

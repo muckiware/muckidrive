@@ -14,9 +14,8 @@ import { Repository, getConnection, Equal } from 'typeorm';
 import { DateTime } from 'luxon';
 import * as lodash from 'lodash';
 
-import { LoaderModel, CreateLoaderDto, NewModuleInput, UpdateModuleInput } from '@muckidrive/loader'
-import { DefaultEntityPaginationInput } from '@muckidrive/basics';
-
+import { LoaderModel, CreateLoaderDto, NewModuleInput, UpdateModuleInput } from '../../loader';
+import { DefaultEntityPaginationInput } from '../../basics';
 
 @Injectable()
 export class LoaderService {

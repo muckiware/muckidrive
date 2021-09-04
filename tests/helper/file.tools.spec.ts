@@ -10,7 +10,7 @@
 import { TestVariables } from '../test.variables';
 import { HelperFileTools } from '../../src/helper';
 
- describe('helperFileTools', () => {
+describe('helperFileTools', () => {
 
     describe('saveObjectByNewFile() without input', () => {
 

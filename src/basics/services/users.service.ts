@@ -14,8 +14,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { DateTime } from 'luxon';
 
 import { UsersModel, CreateUsersDto } from '../models';
-import { HelperStringTools } from '@muckidrive/helper'
-
+// import { HelperStringTools } from '@muckidrive/helper'
+import { HelperStringTools } from '../../helper';
 @Injectable()
 export class UsersService {
 

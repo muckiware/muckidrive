@@ -20,27 +20,11 @@ export const MODULE_LIST = path.normalize(path.join(process.cwd(), 'var/etc/modu
 @Module({})
 export class LoaderModule {
 
-    private static instance: LoaderModule;
-    private _modulesArray: SmoppitSalesModule[];
+    private static _modulesArray: SmoppitSalesModule[];
 
-    constructor() {
-        this._modulesArray = [];
-    }
+    public static async loadModules(): Promise<DynamicModule> {
 
-    static getInstance() {
-
-        if (!LoaderModule.instance) {
-            LoaderModule.instance = new LoaderModule();
-        }
-
-        return LoaderModule.instance
-    }
-  
-    public async registerModules(): Promise<DynamicModule> {
-        return this._loadModules();
-    }
-  
-    private _loadModules(): Promise<DynamicModule> {
+        this._modulesArray = []
 
         Logger.log(`Loading modules from ${MODULE_PATH}`, 'LoaderModule');
   
@@ -94,8 +78,8 @@ export class LoaderModule {
             } as DynamicModule;
         });
     }
-  
-    private _loadModule(modulePath: string): Promise<DynamicModule> {
+
+    private static _loadModule(modulePath: string): Promise<DynamicModule> {
         return import(modulePath);
     }
 }

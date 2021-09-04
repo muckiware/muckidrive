@@ -10,8 +10,10 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
-import { AppModule } from '@muckidrive/app.module';
-import { LoaderService, LoaderModel } from '@muckidrive/loader';
+// import { AppModule } from '@muckidrive/app.module';
+// import { LoaderService, LoaderModel } from '@muckidrive/loader';
+import { AppModule } from '../../app.module';
+import { LoaderService, LoaderModel } from '../../loader';
 
 @Injectable()
 export class LoaderGuard implements CanActivate {

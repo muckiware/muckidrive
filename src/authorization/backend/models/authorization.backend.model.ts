@@ -15,7 +15,8 @@ import {
     JoinColumn
 } from 'typeorm';
 
-import { DefaultEntityModel, UsersModel } from '@muckidrive/basics';
+// import { DefaultEntityModel, UsersModel } from '@muckidrive/basics';
+import { DefaultEntityModel, UsersModel } from '../../../basics';
 
 @Entity({
     name: 'core_authorization_rules_backend',

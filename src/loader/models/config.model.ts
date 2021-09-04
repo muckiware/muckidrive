@@ -10,7 +10,8 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 
-import { DefaultEntityTables, DefaultEntityModel } from '@muckidrive/basics';
+// import { DefaultEntityTables, DefaultEntityModel } from '@muckidrive/basics';
+import { DefaultEntityTables, DefaultEntityModel } from '../../basics';
 
 import { LoaderModel } from './loader.model'
 

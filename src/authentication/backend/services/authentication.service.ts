@@ -8,10 +8,12 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { UsersService } from '@muckidrive/basics'
+// import { UsersService } from '@muckidrive/basics'
 import { JwtService } from '@nestjs/jwt';
 
 import * as bcrypt from 'bcrypt';
+
+import { UsersService } from '../../../basics';
 
 @Injectable()
 export class AuthenticationService {

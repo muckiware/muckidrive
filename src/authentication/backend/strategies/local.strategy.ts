@@ -10,7 +10,8 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthenticationService } from '@muckidrive/authentication/backend';
+// import { AuthenticationService } from '@muckidrive/authentication/backend';
+import { AuthenticationService } from '../services';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {

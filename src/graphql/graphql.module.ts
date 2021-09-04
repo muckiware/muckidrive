@@ -12,7 +12,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule, ConfigService} from '@nestjs/config';
 
 import * as path from 'path';
-import { HelperFileTools } from '@muckidrive/helper';
+// import { HelperFileTools } from '@muckidrive/helper';
+import { HelperFileTools } from '../helper';
 
 @Module({
     imports: [

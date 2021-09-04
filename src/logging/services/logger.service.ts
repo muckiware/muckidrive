@@ -14,8 +14,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { LoggerModule, LoggerServiceInterface } from '../index';
-import { ModuleConfigService } from '@muckidrive/config';
-import { HelperFileTools } from '@muckidrive/helper';
+// import { ModuleConfigService } from '@muckidrive/config';
+import { ModuleConfigService } from '../../config';
+//import { HelperFileTools } from '@muckidrive/helper';
+import { HelperFileTools } from '../../helper';
 @Injectable()
 export class LoggerService implements LoggerServiceInterface {
 
@@ -89,7 +91,7 @@ export class LoggerService implements LoggerServiceInterface {
 
     protected async _setLoggerConfig(loggerContext: string, extensionContext: string): Promise<boolean> {
 
-        let configFilePath: string = this._getConfigPath(loggerContext, extensionContext);
+        let configFilePath: string = this.getConfigPath(loggerContext, extensionContext);
 
         if(this._checkConfigPath(configFilePath, loggerContext, extensionContext)) {
 
@@ -100,7 +102,7 @@ export class LoggerService implements LoggerServiceInterface {
         return false;
     }
 
-    protected _getConfigPath(loggerContext: string = '', extensionContext: string = ''): string {
+    public getConfigPath(loggerContext: string = '', extensionContext: string = ''): string {
 
         let logPath: string = path.resolve() + this.CONFIG_PATH;
 

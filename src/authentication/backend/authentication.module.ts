@@ -14,7 +14,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
 import * as path from 'path';
-import { HelperFileTools } from '@muckidrive/helper';
+// import { HelperFileTools } from '@muckidrive/helper';
+import { HelperFileTools } from '../../helper';
+
 import {
     LocalStrategy,
     JwtStrategy,

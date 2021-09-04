@@ -10,7 +10,8 @@
 import { Module, OnModuleInit, Global } from '@nestjs/common';
 
 import * as path from 'path';
-import { HelperFileTools } from '@muckidrive/helper';
+// import { HelperFileTools } from '@muckidrive/helper';
+import { HelperFileTools } from '../helper';
 
 @Global()
 @Module({

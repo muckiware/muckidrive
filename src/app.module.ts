@@ -8,7 +8,6 @@
  */
 
 import { Module, Global, CacheModule, forwardRef } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 
@@ -20,18 +19,18 @@ import { HelperPathTools } from './helper';
 import { ModuleConfigService } from './config';
 
 import { 
-    LoaderModule,
     LoaderModel,
     ConfigModel,
     LoaderService,
     LoaderResolver
 } from './loader';
+
+import { LoaderModule } from './loader/loader.module';
+
 import { InitModule } from './init';
 import { AuthenticationBackendModule } from './authentication/backend/authentication.module';
 import { AuthorizationBackendModule } from './authorization/backend/authorization.module';
 import { LoggerService, LoggerModule } from './logging';
-
-const loaderInstance = LoaderModule.getInstance();
 
 @Global()
 @Module({
@@ -45,8 +44,10 @@ const loaderInstance = LoaderModule.getInstance();
         GraphQLApiModule,
         AuthenticationBackendModule,
         AuthorizationBackendModule,
-        TypeOrmModule.forFeature([LoaderModel, ConfigModel]),
-        loaderInstance.registerModules(),
+        forwardRef(() => 
+            TypeOrmModule.forFeature([LoaderModel, ConfigModel])
+        ),
+        LoaderModule.loadModules(),
         InitModule,
         CacheModule.register()
     ],

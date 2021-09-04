@@ -12,7 +12,8 @@ import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { ConfigService} from '@nestjs/config';
 
-import { UsersService, UsersModel } from '@muckidrive/basics';
+// import { UsersService, UsersModel } from '@muckidrive/basics';
+import { UsersService, UsersModel } from '../../../basics';
 import {
     AuthorizationBackendService,
     AuthorizationUserRuleBackendModel,

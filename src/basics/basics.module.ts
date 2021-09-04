@@ -22,7 +22,8 @@ import {
     BasicsService
 } from './index';
 
-import { HelperFileTools } from '@muckidrive/helper';
+// import { HelperFileTools } from '@muckidrive/helper';
+import { HelperFileTools } from '../helper';
 
 @Global()
 @Module({
