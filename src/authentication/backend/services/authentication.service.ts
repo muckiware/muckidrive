@@ -13,7 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import * as bcrypt from 'bcrypt';
 
-import { UsersService } from '../../../basics';
+import { UsersService, UsersModel } from '../../../basics';
 
 @Injectable()
 export class AuthenticationService {
@@ -25,7 +25,11 @@ export class AuthenticationService {
 
     async validateUser(username: string, pass: string): Promise<any> {
 
-        const user = await this.usersService.findUserByNameEmail(username);
+        if(username.length === 0 || pass.length === 0) {
+            throw new Error('Invalid input');
+        }
+
+        const user: UsersModel = await this.usersService.findUserByNameEmail(username);
 
         //Only for real users, not for system users
         if (user && !user.isSystemUser) {
@@ -39,7 +43,11 @@ export class AuthenticationService {
         return null;
     }
 
-    async createToken(username: string) {
+    async createToken(username: string): Promise<{access_token: string}> {
+
+        if(username.length === 0) {
+            throw new Error('Invalid input');
+        }
 
         return {
             access_token: this.jwtService.sign({ username: username }),

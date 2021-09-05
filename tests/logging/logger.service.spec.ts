@@ -1,5 +1,5 @@
 /**
- * @package     muckiwareDrive
+ * @package     muckiDrive
  * @subpackage  Server
  *
  * @copyright Copyright (C) 2021 by muckiware. All rights reserved.
@@ -24,7 +24,7 @@ class ModuleConfigServiceMock {
 }
 
 describe('LoggerService', () => {
-    
+
     let loggerService: LoggerService;
 
     beforeEach(async () => {
@@ -107,6 +107,5 @@ describe('LoggerService', () => {
                 JSON.stringify(TestVariables.logConfigObject)
             );
         });
-
     });
 });

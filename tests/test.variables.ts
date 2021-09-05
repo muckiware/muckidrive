@@ -8,6 +8,7 @@
  */
 
 import * as path from 'path';
+import { HelperStringTools } from '../src/helper';
 export class TestVariables {
 
     public static defaultPathMode = 0o0700;
@@ -49,6 +50,37 @@ export class TestVariables {
                 level: "info",
                 enableCallStack: true
             }
+        }
+    };
+    public static testUserPassword = '%password123'
+    public static testUser = {
+        id: 123,
+        createDateTime: new Date('0000-00-00 00:00:00'),
+        version: 1,
+        uuid: 'abc-123',
+        name: 'Fritz',
+        eMail: 'email@example.com',
+        userName: 'Max',
+        firstName: 'Max',
+        lastName: 'Mustermann',
+        password: HelperStringTools.createHashPassword(TestVariables.testUserPassword),
+        isActive: true,
+        isSystemUser: false,
+        isAdminUser: true,
+        languageId: 0,
+        defaultLanguage: {
+            id: 123,
+            createDateTime: new Date('0000-00-00 00:00:00'),
+            version: 1,
+            name: 'string',
+            description: 'string',
+            isActive: true,
+            isDefault: true,
+            code: 'string',
+            codeLong: 'string',
+            codeLocale: 'string',
+            codeCulture: 'string',
+            Iso639xValue: 'string',
         }
     }
 }
