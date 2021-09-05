@@ -157,4 +157,4 @@ this.loggerService.fatal(message: string, loggerContext?: string, extensionConte
 ```
 
 ## License
-smoppit sales server is [MIT licensed](LICENSE).
+muckiDrive server is [MIT licensed](LICENSE).
