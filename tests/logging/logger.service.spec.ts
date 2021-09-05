@@ -94,7 +94,7 @@ describe('LoggerService', () => {
 
     describe('createConfigObject()', () => {
 
-        it('should creates an logger config object', async () => {
+        it('should creates an logger config object by test variable pattern', async () => {
 
             let configObject = await loggerService.createConfigObject(
                 TestVariables.inputLoggerContext,

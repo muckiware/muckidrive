@@ -3,9 +3,9 @@
 [muckiDrive](https://github.com/muckiware/muckidrive) server system repository. Basic for data service with GraphQL interface connection.
 
 ## Features
-- nest.js basic and module structures
-- typeORM integration for database actions
-- GraphQL data interface integration
+- [nest.js](https://nestjs.com) basic and module structures
+- [typeORM](https://typeorm.io) integration for database actions
+- [GraphQL](https://graphql.org) data interface integration
 - Logging integration
 - System user and ACL managment
 - JWT authentification
@@ -22,6 +22,13 @@ $ npm install
 ```bash
 # start server application
 $ nest start
+```
+
+# Testing the server
+
+```bash
+# Testing server application with Jest framework
+$ npm run test
 ```
 
 ## Configuration
