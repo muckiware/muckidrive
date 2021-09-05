@@ -13,6 +13,8 @@ import * as path from 'path';
 import { LoggerService } from '../../src/logging';
 import { ModuleConfigService } from '../../src/config';
 
+import { TestVariables } from '../test.variables';
+
 class ModuleConfigServiceMock {
 
     getValueByKey(moduleName: string, key: string, defaultValue: any = null) {
@@ -41,25 +43,51 @@ describe('LoggerService', () => {
 
     describe('_getConfigPath()', () => {
 
+        it('should return an complete config path string', async () => {
+
+            expect(
+                loggerService.getConfigPath(TestVariables.inputLoggerContext, TestVariables.inputExtensionContext)
+            ).toBe(path.resolve() + loggerService.CONFIG_PATH + '/logconfig.extensionContext.' + TestVariables.inputLoggerContext + '.json');
+        });
+
+        it('should return an config path string only loggerContext', async () => {
+
+            expect(
+                loggerService.getConfigPath(TestVariables.inputLoggerContext)
+            ).toBe(path.resolve() + loggerService.CONFIG_PATH + '/logconfig.' + TestVariables.inputLoggerContext + '.json');
+        });
+
+        it('should return an config path string without params', async () => {
+
+            expect(
+                loggerService.getConfigPath()
+            ).toBe(path.resolve() + loggerService.CONFIG_PATH + '/logconfig.json');
+        });
+    });
+
+    describe('_getLoggerFileName()', () => {
+
         it('should return an complete log path string', async () => {
 
             expect(
-                loggerService.getConfigPath('loggerContext', 'extensionContext')
-            ).toBe(path.resolve() + loggerService.CONFIG_PATH + '/logconfig.extensionContext.loggerContext.json');
+                loggerService.getLoggerFileName(TestVariables.inputLoggerContext, 'extensionContext')
+            ).toBe(
+                path.resolve() + loggerService.LOG_PATH + '/' + TestVariables.inputExtensionContext + '.' + TestVariables.inputLoggerContext + '.log'
+            );
         });
 
         it('should return an log path string only loggerContext', async () => {
 
             expect(
-                loggerService.getConfigPath('loggerContext')
-            ).toBe(path.resolve() + loggerService.CONFIG_PATH + '/logconfig.loggerContext.json');
+                loggerService.getLoggerFileName(TestVariables.inputLoggerContext)
+            ).toBe(path.resolve() + loggerService.LOG_PATH + '/muckidrive.' + TestVariables.inputLoggerContext + '.log');
         });
 
         it('should return an log path string without params', async () => {
 
             expect(
-                loggerService.getConfigPath()
-            ).toBe(path.resolve() + loggerService.CONFIG_PATH + '/logconfig.json');
+                loggerService.getLoggerFileName()
+            ).toBe(path.resolve() + loggerService.LOG_PATH + '/muckidrive.log');
         });
     });
 });

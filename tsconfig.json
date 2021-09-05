@@ -26,6 +26,7 @@
       "@muckidrive-appmodules/*": [
         "app_modules/src/*"
       ]
-    }
+    },
+    "allowJs": true
   }
 }

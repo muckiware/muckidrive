@@ -7,7 +7,7 @@
  * @link https://github.com/muckiware/muckidrive
  */
 
-import { Module, Global, OnModuleInit } from '@nestjs/common';
+import { Module, Global, OnModuleInit, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import * as path from 'path';
@@ -23,10 +23,12 @@ import {
 @Global()
 @Module({
     imports: [
-        TypeOrmModule.forFeature([
-            AuthorizationRulesBackendModel,
-            AuthorizationUserRuleBackendModel
-        ])
+        forwardRef(() => 
+            TypeOrmModule.forFeature([
+                AuthorizationRulesBackendModel,
+                AuthorizationUserRuleBackendModel
+            ])
+        )
     ],
     providers: [
         AuthorizationBackendService,

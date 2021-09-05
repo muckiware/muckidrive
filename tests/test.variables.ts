@@ -9,4 +9,6 @@ export class TestVariables {
         test: 123,
         test2: 'test-string'
     }
+    public static inputExtensionContext = 'extensionContext';
+    public static inputLoggerContext = 'loggerContext';
 }

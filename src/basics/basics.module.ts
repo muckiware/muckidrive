@@ -7,7 +7,7 @@
  * @link https://github.com/muckiware/muckidrive
  */
 
-import { Module, Global, Logger, OnModuleInit } from '@nestjs/common';
+import { Module, Global, Logger, OnModuleInit, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import * as path from 'path';
@@ -28,12 +28,14 @@ import { HelperFileTools } from '../helper';
 @Global()
 @Module({
     imports: [
-        TypeOrmModule.forFeature([
-            Stores,
-            StoresTranslation,
-            LanguagesModel,
-            UsersModel
-        ])
+        forwardRef(() => 
+            TypeOrmModule.forFeature([
+                Stores,
+                StoresTranslation,
+                LanguagesModel,
+                UsersModel
+            ])
+        )
     ],
     providers: [ 
         LanguagesService,

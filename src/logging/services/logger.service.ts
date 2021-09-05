@@ -22,6 +22,7 @@ import { HelperFileTools } from '../../helper';
 export class LoggerService implements LoggerServiceInterface {
 
     CONFIG_PATH: string = '/var/etc';
+    LOG_PATH: string = '/var/log';
 
     private _logger: log4js.Logger;
 
@@ -118,9 +119,10 @@ export class LoggerService implements LoggerServiceInterface {
         }
     }
 
-    protected _getLoggerFileName(loggerContext = '', extensionContext = ''): string {
+    public getLoggerFileName(loggerContext = '', extensionContext = ''): string {
         
-        let logPath = path.resolve() + '/var/log';
+        let logPath = path.resolve() + this.LOG_PATH;
+
         switch (true) {
             case (loggerContext !== '' && extensionContext !== ''):
                 return logPath + '/' + extensionContext + '.' + loggerContext + '.log';
@@ -142,7 +144,7 @@ export class LoggerService implements LoggerServiceInterface {
         return false;
     }
 
-    protected _checkConfigFile($path: string, $loggerContext: string = '', $extensionContext: string = '') {
+    protected _checkConfigFile($path: string, $loggerContext: string = '', $extensionContext: string = ''): boolean {
         
         if(fs.existsSync($path)) {
             return true;
@@ -176,7 +178,7 @@ export class LoggerService implements LoggerServiceInterface {
                             type: 'pattern',
                             pattern: '%d level: %p, message: %m'
                         },
-                        filename: this._getLoggerFileName(loggerContext, extensionContext),
+                        filename: this.getLoggerFileName(loggerContext, extensionContext),
                         backups: await this.getModuleConfigValueByKey('max_files', 5),
                         maxLogSize: await this.getModuleConfigValueByKey('max_size', 5) * 1024 * 1024
                     }

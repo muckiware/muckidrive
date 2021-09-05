@@ -7,7 +7,7 @@
  * @link https://github.com/muckiware/muckidrive
  */
 
- import { TestVariables } from '../test.variables';
+import { TestVariables } from '../test.variables';
 import * as bcrypt from 'bcrypt';
 
 import { HelperStringTools } from '../../src/helper';
