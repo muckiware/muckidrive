@@ -18,7 +18,8 @@ import { TestVariables } from '../test.variables';
 class ModuleConfigServiceMock {
 
     getValueByKey(moduleName: string, key: string, defaultValue: any = null) {
-        return {};
+
+        return defaultValue;
     }
 }
 
@@ -41,7 +42,7 @@ describe('LoggerService', () => {
         loggerService = moduleRef.get<LoggerService>(LoggerService);
     });
 
-    describe('_getConfigPath()', () => {
+    describe('getConfigPath()', () => {
 
         it('should return an complete config path string', async () => {
 
@@ -65,7 +66,7 @@ describe('LoggerService', () => {
         });
     });
 
-    describe('_getLoggerFileName()', () => {
+    describe('getLoggerFileName()', () => {
 
         it('should return an complete log path string', async () => {
 
@@ -89,5 +90,23 @@ describe('LoggerService', () => {
                 loggerService.getLoggerFileName()
             ).toBe(path.resolve() + loggerService.LOG_PATH + '/muckidrive.log');
         });
+    });
+
+    describe('createConfigObject()', () => {
+
+        it('should creates an logger config object', async () => {
+
+            let configObject = await loggerService.createConfigObject(
+                TestVariables.inputLoggerContext,
+                TestVariables.inputExtensionContext
+            );
+
+            expect(
+                JSON.stringify(configObject)
+            ).toBe(
+                JSON.stringify(TestVariables.logConfigObject)
+            );
+        });
+
     });
 });

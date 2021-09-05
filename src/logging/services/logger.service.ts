@@ -34,7 +34,7 @@ export class LoggerService implements LoggerServiceInterface {
 
         if(await this.getModuleConfigValueByKey('enable')) {
             if(this._setLoggerConfig(loggerContext, extensionContext)) {
-                this._logger.info(message);
+                this._logger.trace(message);
             }
         }
     }
@@ -144,18 +144,61 @@ export class LoggerService implements LoggerServiceInterface {
         return false;
     }
 
-    protected _checkConfigFile($path: string, $loggerContext: string = '', $extensionContext: string = ''): boolean {
+    protected _checkConfigFile(path: string, $loggerContext: string = '', $extensionContext: string = ''): boolean {
+
+        if(path === '') {
+            throw new Error('Invalid input');
+        }
         
-        if(fs.existsSync($path)) {
+        if(fs.existsSync(path)) {
             return true;
         } else {
 
-            this._createConfigJson($path, $loggerContext, $extensionContext);
+            this._createConfigJson(path, $loggerContext, $extensionContext);
             
-            if(fs.existsSync($path)) {
+            if(fs.existsSync(path)) {
                 return true;
             } else {
                 return false;
+            }
+        }
+    }
+
+    public async createConfigObject(loggerContext: string, extensionContext: string) {
+
+        let loggerType = loggerContext + extensionContext;
+        if(loggerType.length === 0) {
+            loggerType = 'app'
+        }
+
+        return {
+            "appenders": {
+                out: {
+                    type: "stdout",
+                    layout: { 
+                        type: 'basic'
+                    }
+                },
+                [loggerType]: {
+                    type: "file",
+                    layout: {
+                        type: 'pattern',
+                        pattern: '%d level: %p, message: %m'
+                    },
+                    filename: this.getLoggerFileName(loggerContext, extensionContext),
+                    backups: await this.getModuleConfigValueByKey('max_files', 5),
+                    maxLogSize: await this.getModuleConfigValueByKey('max_size', 5) * 1024 * 1024
+                }
+            },
+            categories: {
+                default: {
+                    appenders: [
+                        "out",
+                        loggerType
+                    ],
+                    level: await this.getModuleConfigValueByKey('loglevel', 'info'),
+                    enableCallStack: true
+                }
             }
         }
     }
@@ -164,36 +207,7 @@ export class LoggerService implements LoggerServiceInterface {
 
         HelperFileTools.saveObjectByNewFile(
             path,
-            {
-                "appenders": {
-                    out: {
-                        type: "stdout",
-                        layout: { 
-                            type: 'basic'
-                        }
-                    },
-                    [loggerContext + extensionContext]: {
-                        type: "file",
-                        layout: {
-                            type: 'pattern',
-                            pattern: '%d level: %p, message: %m'
-                        },
-                        filename: this.getLoggerFileName(loggerContext, extensionContext),
-                        backups: await this.getModuleConfigValueByKey('max_files', 5),
-                        maxLogSize: await this.getModuleConfigValueByKey('max_size', 5) * 1024 * 1024
-                    }
-                },
-                categories: {
-                    default: {
-                        appenders: [
-                            "out",
-                            loggerContext + extensionContext
-                        ],
-                        level: await this.getModuleConfigValueByKey('loglevel', 'info'),
-                        enableCallStack: true
-                    }
-                }
-            }
+            await this.createConfigObject(loggerContext, extensionContext)
         );
     }
 }
