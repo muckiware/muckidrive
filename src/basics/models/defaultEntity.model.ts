@@ -1,8 +1,8 @@
 /**
- * @package     muckiwareDrive
+ * @package     muckiDrive
  * @subpackage  Server
  *
- * @copyright Copyright (C) 2021 by smoppit. All rights reserved.
+ * @copyright Copyright (C) 2021 by muckiware. All rights reserved.
  * @license MIT
  * @link https://github.com/muckiware/muckidrive
  */
@@ -18,11 +18,6 @@ import { Field, ObjectType, ID } from '@nestjs/graphql';
 import { UsersModel, LanguagesModel } from './index';
 
 export class DefaultEntityTables {
-
-    /**
-     * Table for category language items 
-     */
-    public static readonly TABLE_CATEGORIES_TRANSLATION = 'catalog_categories_translation'
 
     /**
      * Global existing languages and specific language settingd
