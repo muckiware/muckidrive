@@ -104,6 +104,7 @@ dist
 .tern-port
 
 # Specifics
-app_modules
+# app_modules
+app_modules/src/smoppit-sales
 var/etc
 **/.DS_Store
