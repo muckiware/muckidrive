@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      max-parallel: 24
       matrix:
         node-version: [12.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
@@ -26,5 +27,5 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: jest install
+    - run: npm ci
     - run: npm test
