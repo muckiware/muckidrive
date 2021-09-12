@@ -8,7 +8,17 @@
  */
 
 import { Field, InputType } from '@nestjs/graphql';
-import { IsOptional, IsBoolean, Length, MaxLength, MinLength, IsNumber, IsEmail, IsString } from 'class-validator';
+import {
+    IsOptional,
+    IsBoolean,
+    Length,
+    MaxLength,
+    MinLength,
+    IsNumber,
+    IsEmail,
+    IsString,
+    IsUUID
+} from 'class-validator';
 
 export class CreateUsersDto {
 
@@ -44,21 +54,20 @@ export class CreateUsersDto {
 export class NewUserInput {
 
     @Field()
-    @IsString()
-    @MinLength(1)
-    @MaxLength(250)
-    uuid: string;
+    @IsUUID(4)
+    @IsOptional()
+    uuid?: string;
 
     @Field({ nullable: true })
     @IsString()
     @MinLength(3)
-    @MinLength(250)
+    @MaxLength(100)
     name: string;
 
     @Field({ nullable: true })
     @IsString()
     @MinLength(3)
-    @MinLength(250)
+    @MaxLength(100)
     @IsOptional()
     userName: string;
 
@@ -79,6 +88,7 @@ export class NewUserInput {
     @Field()
     @IsString()
     @MinLength(8)
+    @MaxLength(100)
     password: string;
 
     @Field()

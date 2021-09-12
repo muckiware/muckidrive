@@ -74,4 +74,18 @@ export class UsersModel extends DefaultUserLessEntityModel {
     @ManyToOne(type => LanguagesModel, (language) => language.id)
     @JoinColumn([{ name: 'languageId', referencedColumnName: 'id' }])
     defaultLanguage: LanguagesModel
+
+    /**
+     * Static merthod for to create model for testings
+     * 
+     * @param params 
+     * @returns 
+     */
+    public static getModel(params: Partial<UsersModel>): UsersModel {
+
+        const usersModel = new UsersModel();
+        Object.assign(usersModel, params);
+    
+        return usersModel;
+    }
 }

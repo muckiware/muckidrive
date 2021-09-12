@@ -7,14 +7,14 @@
  * @link https://github.com/muckiware/muckidrive
  */
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, getConnection } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { DateTime } from 'luxon';
+import { validate, ValidationError } from 'class-validator'
 
-import { UsersModel, CreateUsersDto } from '../models';
-// import { HelperStringTools } from '@muckidrive/helper'
+import { UsersModel, NewUserInput } from '../models';
 import { HelperStringTools } from '../../helper';
 @Injectable()
 export class UsersService {
@@ -24,22 +24,37 @@ export class UsersService {
         private readonly usersRepository: Repository<UsersModel>
     ) {}
 
-    create(createCategoryDto: CreateUsersDto): Promise<UsersModel> {
+    async create(createCategoryDto: NewUserInput): Promise<UsersModel> {
+
+        let createUsersData = new NewUserInput();
+        createUsersData.eMail = createCategoryDto.eMail;
+        createUsersData.name = createCategoryDto.name;
+        createUsersData.userName = createCategoryDto.userName;
+        createUsersData.firstName = createCategoryDto.firstName;
+        createUsersData.lastName = createCategoryDto.lastName;
+        createUsersData.isActive = createCategoryDto.isActive;
+        createUsersData.isSystemUser = createCategoryDto.isSystemUser;
+        createUsersData.languageId = createCategoryDto.languageId;
+        createUsersData.password = createCategoryDto.password;
+
+        let validateInputs: ValidationError[] = await validate(createUsersData);
+        if(validateInputs.length >= 1) {
+            throw new BadRequestException('Unvalid input data', validateInputs.toString());
+        }
 
         const user = new UsersModel();
-        user.uuid = uuidv4();
-        user.name = createCategoryDto.name;
-        user.userName = createCategoryDto.userName;
-        user.firstName = createCategoryDto.firstName;
-        user.lastName = createCategoryDto.lastName;
-        user.eMail = createCategoryDto.eMail;
+        Object.assign(user, createCategoryDto);
+
+        if(createCategoryDto.uuid !== '') {
+            user.uuid = createCategoryDto.uuid;
+        } else {
+            user.uuid = uuidv4();
+        }
         user.password = HelperStringTools.createHashPassword(createCategoryDto.password);
-        user.isActive = createCategoryDto.isActive;
-        user.isSystemUser = createCategoryDto.isSystemUser;
-        user.languageId = createCategoryDto.languageId;
         user.createDateTime = new Date(DateTime.utc().toString());
 
-        return this.usersRepository.save(user);
+        console.log('save user', user);
+        return await this.usersRepository.save(user);
     }
 
     async findAll(orderField = 'id', sortDirection = 'ASC', skip = 0, take = 10): Promise<UsersModel[]> {
@@ -54,8 +69,20 @@ export class UsersService {
         );
     }
 
-    findOne(id: number): Promise<UsersModel> {
-        return this.usersRepository.findOne(id);
+    public async findOne(id: number): Promise<UsersModel> {
+
+        if(id < 0) {
+            throw new BadRequestException('Unvalid input data, missing id input');
+        }
+
+        const user = await this.usersRepository.findOne({
+            id,
+        });
+        if (!user) {
+            throw new NotFoundException('No user found');
+        }
+
+        return user
     }
 
     /**
