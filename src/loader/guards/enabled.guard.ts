@@ -2,7 +2,7 @@
  * @package     muckiwareDrive
  * @subpackage  Server
  *
- * @copyright Copyright (C) 2021 by smoppit. All rights reserved.
+ * @copyright Copyright (C) 2021 by muckiware. All rights reserved.
  * @license MIT
  * @link https://github.com/muckiware/muckidrive
  */
@@ -20,6 +20,12 @@ export class LoaderGuard implements CanActivate {
 
     constructor() {}
 
+    /**
+     * Guard for to check, if current module is enable.
+     * 
+     * @param context
+     * @returns boolean
+     */
     async canActivate(context: ExecutionContext): Promise<boolean> {
 
         const app = await NestFactory.create(AppModule);

@@ -43,7 +43,6 @@ describe('UsersService', () => {
         const moduleRef: TestingModule = await Test.createTestingModule({
             providers: [ 
                 UsersService,
-                Reflector,
                 {
                     provide: getRepositoryToken(UsersModel),
                     useClass: UsersServiceMock,

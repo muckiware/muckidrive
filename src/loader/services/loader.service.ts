@@ -8,21 +8,22 @@
  */
 
 //Import Framework parts
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, getConnection, Equal } from 'typeorm';
 import { DateTime } from 'luxon';
 import * as lodash from 'lodash';
 
-import { LoaderModel, CreateLoaderDto, NewModuleInput, UpdateModuleInput } from '../../loader';
-import { DefaultEntityPaginationInput } from '../../basics';
+import { LoaderModel, CreateLoaderDto, NewModuleInput, UpdateModuleInput, LoaderModelOutput } from '../../loader';
+import { DefaultEntityPaginationInput, BasicsService } from '../../basics';
 
 @Injectable()
 export class LoaderService {
 
     constructor(
         @InjectRepository(LoaderModel)
-        private readonly loaderRepository: Repository<LoaderModel>
+        private readonly loaderRepository: Repository<LoaderModel>,
+        private readonly basicsService: BasicsService
     ) {}
 
     public create(systemUserId: number, CreateLoaderDto: NewModuleInput): Promise<LoaderModel> {
@@ -110,9 +111,48 @@ export class LoaderService {
      * @param entityPaginationInput 
      * @returns 
      */
+    async findAndCountAll(entityPaginationInput: DefaultEntityPaginationInput = {}, withoutFilter: boolean = false): Promise<LoaderModelOutput> {
+
+        let result: any;
+        if(withoutFilter || lodash.isEmpty(entityPaginationInput)) {
+
+            console.log('without filter')
+            result = await this.loaderRepository.findAndCount({
+
+                relations: [
+                    'config',
+                ]
+            });
+        } else {
+
+            result = await this.loaderRepository.findAndCount({
+
+                relations: [
+                    'config',
+                ],
+                skip: this.basicsService.getSkipValue(entityPaginationInput.perPage, entityPaginationInput.pageNumber),
+                take: entityPaginationInput.perPage,
+                order: {
+                    [entityPaginationInput.orderField]: entityPaginationInput.sortDirection
+                }
+            });
+        }
+
+        return {
+            items: result[0],
+            total: result[1],
+            maxPage: Math.ceil(result[1] / entityPaginationInput.perPage),
+            prevPage: this.basicsService.getPrevPageNumber(entityPaginationInput.perPage, entityPaginationInput.pageNumber, result[1]),
+            currentPage: entityPaginationInput.pageNumber,
+            nextPage: this.basicsService.getNextPageNumber(entityPaginationInput.perPage, entityPaginationInput.pageNumber, result[1])
+        }
+    }
+
     async findAll(entityPaginationInput: DefaultEntityPaginationInput = {}, withoutFilter: boolean = false): Promise<LoaderModel[]> {
 
-        if(withoutFilter || lodash.isEmpty()) {
+        if(withoutFilter || lodash.isEmpty(entityPaginationInput)) {
+
+            console.log('without filter')
             return this.loaderRepository.find({
 
                 relations: [
@@ -126,8 +166,8 @@ export class LoaderService {
                 relations: [
                     'config',
                 ],
-                skip: entityPaginationInput.skip,
-                take: entityPaginationInput.take,
+                skip: entityPaginationInput.pageNumber,
+                take: entityPaginationInput.perPage,
                 order: {
                     [entityPaginationInput.orderField]: entityPaginationInput.sortDirection
                 }

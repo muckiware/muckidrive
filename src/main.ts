@@ -17,7 +17,13 @@ declare const module: any;
 async function bootstrap() {
 
     const app = await NestFactory.create(AppModule);
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(
+        new ValidationPipe({
+            skipMissingProperties: true,
+            enableDebugMessages: false,
+            stopAtFirstError: true
+        })
+    );
     const configService = app.get(ConfigService);
 
     await app.listen(configService.get<number>('http.port'));

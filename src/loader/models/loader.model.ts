@@ -8,7 +8,7 @@
  */
 
 import { Column, PrimaryGeneratedColumn, Entity, OneToMany, JoinColumn } from 'typeorm';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType, InputType, Int } from '@nestjs/graphql';
 
 // import { DefaultEntityTables, DefaultEntityModel } from '@muckidrive/basics';
 import { DefaultEntityTables, DefaultEntityModel } from '../../basics';
@@ -43,26 +43,47 @@ export class LoaderModel extends DefaultEntityModel {
     @Field(type => [ConfigModel], { nullable: true })
     @OneToMany(type => ConfigModel, (config) => config.module)
     @JoinColumn([{ name: 'id', referencedColumnName: 'moduleId' }])
-    //@JoinColumn([{ name: 'moduleId', referencedColumnName: 'id' }])
     config: ConfigModel[]
 
-    @Field()
+    @Field({ nullable: true })
     @Column({ nullable: true })
     author: string;
 
-    @Field()
+    @Field({ nullable: true })
     @Column({ nullable: true })
     vendor: string;
 
-    @Field()
+    @Field({ nullable: true })
     @Column({ length: 25, nullable: true })
     license: string;
 
-    @Field()
+    @Field({ nullable: true })
     @Column('longtext', { nullable: true })
     keywords: string;
 
-    @Field()
+    @Field({ nullable: true })
     @Column({ nullable: true })
     homepage: string;
 }
+
+@ObjectType()
+export class LoaderModelOutput {
+
+    @Field(() => [LoaderModel])
+    items: LoaderModel[];
+
+    @Field(() => Int)
+    total: Number;
+
+    @Field(() => Int)
+    maxPage: Number;
+
+    @Field(() => Int)
+    prevPage: Number;
+
+    @Field(() => Int)
+    currentPage: Number;
+
+    @Field(() => Int)
+    nextPage: Number;
+} 

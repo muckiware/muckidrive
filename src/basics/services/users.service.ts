@@ -53,7 +53,6 @@ export class UsersService {
         user.password = HelperStringTools.createHashPassword(createCategoryDto.password);
         user.createDateTime = new Date(DateTime.utc().toString());
 
-        console.log('save user', user);
         return await this.usersRepository.save(user);
     }
 
@@ -90,13 +89,22 @@ export class UsersService {
      * @param userId
      * @returns 
      */
-    findUserByUuid(userId: string): Promise<UsersModel> {
+    findUserByUuid(uuid: string): Promise<UsersModel> {
 
-        return this.usersRepository.findOne({
+        if(uuid === '') {
+            throw new BadRequestException('Unvalid input data, missing id input');
+        }
+
+        const user = this.usersRepository.findOne({
             where:  {
-                uuid: userId
+                uuid: uuid
             }
         });
+        if (!user) {
+            throw new NotFoundException('No user found');
+        }
+
+        return user
     }
 
     /**

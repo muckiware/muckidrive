@@ -12,4 +12,4 @@ export * from './models';
 export * from './services';
 export * from './loader.interface';
 export * from './loader.module';
-export * from './loader.resolver';
+//export * from './loader.resolver';

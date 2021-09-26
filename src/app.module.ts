@@ -22,7 +22,7 @@ import {
     LoaderModel,
     ConfigModel,
     LoaderService,
-    LoaderResolver
+    //LoaderResolver
 } from './loader';
 
 import { LoaderModule } from './loader/loader.module';
@@ -49,12 +49,14 @@ import { LoggerService, LoggerModule } from './logging';
         ),
         LoaderModule.loadModules(),
         InitModule,
-        CacheModule.register()
+        CacheModule.register(),
+        
+
     ],
     controllers: [],
     providers: [
         LoaderService,
-        LoaderResolver,
+        //LoaderResolver,
         HelperPathTools,
         LoggerService,
         ModuleConfigService
@@ -66,7 +68,7 @@ import { LoggerService, LoggerModule } from './logging';
         LoggerModule,
         GraphQLApiModule,
         LoaderService,
-        LoaderResolver,
+        //LoaderResolver,
         HelperPathTools,
         LoggerService,
         ModuleConfigService
