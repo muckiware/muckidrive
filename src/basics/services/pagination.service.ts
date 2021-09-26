@@ -1,6 +1,6 @@
 /**
  * @package     muckiwareDrive
- * @subpackage  Server
+ * @subpackage  Server core
  *
  * @copyright Copyright (C) 2021 by muckiware. All rights reserved.
  * @license MIT
@@ -9,31 +9,15 @@
 
 //Import Framework parts
 import { Injectable, BadRequestException } from '@nestjs/common';
-
-//Import Smoppit sales parts
-import { HelperPathTools } from '../../helper'
-import { DefaultEntityPaginationInput, sortDirections } from '../index'
-import lodash from 'Lodash';
+import { DefaultEntityPaginationInput } from '../../basics';
 
 @Injectable()
-export class BasicsService {
+export class BasicServicePagination {
 
     public readonly DEFAULT_TAKE = 50;
     public readonly DEFAULT_SKIP = 1;
 
-    constructor(
-        private helperPathTools: HelperPathTools
-    ) {}
-
-    public getModuleListPath(): string {
-
-		    return this.helperPathTools.getModuleListPath();
-	  }
-
-    public getDefaultsPath(): string {
-
-		    return this.helperPathTools.getDefaultsPath();
-	  }
+    constructor() {}
 
     public getSkipValue(perPage: number, pageNumber: number): number {
 
@@ -94,5 +78,17 @@ export class BasicsService {
             default:
                 return maxPage -1;
         }
+    }
+
+    public getPagination(total: number, entityPaginationInput: DefaultEntityPaginationInput) {
+
+        return {
+            total: total,
+            maxPage: Math.ceil(total / entityPaginationInput.perPage),
+            prevPage: this.getPrevPageNumber(entityPaginationInput.perPage, entityPaginationInput.pageNumber, total),
+            currentPage: entityPaginationInput.pageNumber,
+            nextPage: this.getNextPageNumber(entityPaginationInput.perPage, entityPaginationInput.pageNumber, total)
+        }
+            
     }
 }

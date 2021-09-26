@@ -15,7 +15,7 @@ import { DateTime } from 'luxon';
 import * as lodash from 'lodash';
 
 import { LoaderModel, CreateLoaderDto, NewModuleInput, UpdateModuleInput, LoaderModelOutput } from '../../loader';
-import { DefaultEntityPaginationInput, BasicsService } from '../../basics';
+import { DefaultEntityPaginationInput, BasicServicePagination } from '../../basics';
 
 @Injectable()
 export class LoaderService {
@@ -23,7 +23,7 @@ export class LoaderService {
     constructor(
         @InjectRepository(LoaderModel)
         private readonly loaderRepository: Repository<LoaderModel>,
-        private readonly basicsService: BasicsService
+        private readonly basicServicePagination: BasicServicePagination
     ) {}
 
     public create(systemUserId: number, CreateLoaderDto: NewModuleInput): Promise<LoaderModel> {
@@ -130,7 +130,7 @@ export class LoaderService {
                 relations: [
                     'config',
                 ],
-                skip: this.basicsService.getSkipValue(entityPaginationInput.perPage, entityPaginationInput.pageNumber),
+                skip: this.basicServicePagination.getSkipValue(entityPaginationInput.perPage, entityPaginationInput.pageNumber),
                 take: entityPaginationInput.perPage,
                 order: {
                     [entityPaginationInput.orderField]: entityPaginationInput.sortDirection
@@ -140,11 +140,7 @@ export class LoaderService {
 
         return {
             items: result[0],
-            total: result[1],
-            maxPage: Math.ceil(result[1] / entityPaginationInput.perPage),
-            prevPage: this.basicsService.getPrevPageNumber(entityPaginationInput.perPage, entityPaginationInput.pageNumber, result[1]),
-            currentPage: entityPaginationInput.pageNumber,
-            nextPage: this.basicsService.getNextPageNumber(entityPaginationInput.perPage, entityPaginationInput.pageNumber, result[1])
+            pagination: this.basicServicePagination.getPagination(result[1], entityPaginationInput)
         }
     }
 

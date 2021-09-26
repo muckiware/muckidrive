@@ -11,7 +11,7 @@ import { Column, PrimaryGeneratedColumn, Entity, OneToMany, JoinColumn } from 't
 import { Field, ID, ObjectType, InputType, Int } from '@nestjs/graphql';
 
 // import { DefaultEntityTables, DefaultEntityModel } from '@muckidrive/basics';
-import { DefaultEntityTables, DefaultEntityModel } from '../../basics';
+import { DefaultEntityTables, DefaultEntityModel, TPagination } from '../../basics';
 
 import { ConfigModel } from './config.model';
 
@@ -72,18 +72,6 @@ export class LoaderModelOutput {
     @Field(() => [LoaderModel])
     items: LoaderModel[];
 
-    @Field(() => Int)
-    total: Number;
-
-    @Field(() => Int)
-    maxPage: Number;
-
-    @Field(() => Int)
-    prevPage: Number;
-
-    @Field(() => Int)
-    currentPage: Number;
-
-    @Field(() => Int)
-    nextPage: Number;
+    @Field(() => TPagination)
+    pagination: TPagination;
 } 

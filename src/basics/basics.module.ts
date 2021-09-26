@@ -19,7 +19,8 @@ import {
     LanguagesService,
     UsersModel,
     UsersService,
-    BasicsService
+    BasicsService,
+    BasicServicePagination
 } from './index';
 
 // import { HelperFileTools } from '@muckidrive/helper';
@@ -40,13 +41,15 @@ import { HelperFileTools } from '../helper';
     providers: [ 
         LanguagesService,
         UsersService,
-        BasicsService
+        BasicsService,
+        BasicServicePagination
     ],
     controllers: [],
     exports: [
         LanguagesService,
         UsersService,
-        BasicsService
+        BasicsService,
+        BasicServicePagination
     ]
 })
 export class BasicsModule implements OnModuleInit {
