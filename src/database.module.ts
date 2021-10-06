@@ -37,7 +37,7 @@ export class DatabaseModule {
 
     public static async registerDatabaseModuleAsync(): Promise<DynamicModule> {
 
-        Logger.log('Loading databse module', 'LoadDatabaseModule');
+        Logger.log('Loading database module', 'LoadDatabaseModule');
         return {
             module: DatabaseModule,
         } as DynamicModule;

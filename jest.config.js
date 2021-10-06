@@ -22,4 +22,6 @@ module.exports = {
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
     prefix: `${__dirname}/`,
   }),
+    verbose: true,
+    clearMocks: true
 };

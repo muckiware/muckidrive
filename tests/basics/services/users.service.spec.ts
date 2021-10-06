@@ -43,6 +43,7 @@ describe('UsersService', () => {
         const moduleRef: TestingModule = await Test.createTestingModule({
             providers: [ 
                 UsersService,
+                Reflector,
                 {
                     provide: getRepositoryToken(UsersModel),
                     useClass: UsersServiceMock,
@@ -194,7 +195,7 @@ describe('UsersService', () => {
 
         it('throws an error when a user doesnt exist', async () => {
 
-            const id = faker.random.number();
+            const id = faker.datatype.number();
     
             const userRepositoryFindOneSpy = jest
                 .spyOn(userRepository, 'findOne')
@@ -218,7 +219,7 @@ describe('UsersService', () => {
 
             expect.assertions(2);
 
-            const id = faker.random.number();
+            const id = faker.datatype.number();
             const email = faker.internet.email();
     
             const existingUser = UsersModel.getModel({
