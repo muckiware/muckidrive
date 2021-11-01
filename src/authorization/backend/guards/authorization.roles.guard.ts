@@ -38,7 +38,6 @@ export class AuthorizationRolesGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
 
-        console.log('context', context.switchToHttp);
         const bearer: string = this.getHeadersBearer(context);
         const classContent: any = context.getClass();
 
@@ -62,8 +61,6 @@ export class AuthorizationRolesGuard implements CanActivate {
     private getHeadersBearer(context: ExecutionContext): string {
 
         const ctx = GqlExecutionContext.create(context);
-
-        console.log('ctx', ctx);
 
         const authorization = ctx.getContext().req.headers.authorization.split(' ');
         if(authorization.includes('Bearer')) {

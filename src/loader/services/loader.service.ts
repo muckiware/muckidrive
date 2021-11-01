@@ -13,9 +13,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, getConnection, Equal } from 'typeorm';
 import { DateTime } from 'luxon';
 import * as lodash from 'lodash';
+import { HelperStringTools } from '../../helper';
 
 import { LoaderModel, CreateLoaderDto, NewModuleInput, UpdateModuleInput, LoaderModelOutput } from '../../loader';
-import { DefaultEntityPaginationInput, BasicServicePagination } from '../../basics';
+import {
+    DefaultEntityPaginationInput,
+    BasicServicePagination,
+    DefaultEntityFilterInput,
+    DatabaseService
+} from '../../basics';
 
 @Injectable()
 export class LoaderService {
@@ -23,7 +29,8 @@ export class LoaderService {
     constructor(
         @InjectRepository(LoaderModel)
         private readonly loaderRepository: Repository<LoaderModel>,
-        private readonly basicServicePagination: BasicServicePagination
+        private readonly basicServicePagination: BasicServicePagination,
+        private readonly databaseService: DatabaseService
     ) {}
 
     public create(systemUserId: number, CreateLoaderDto: NewModuleInput): Promise<LoaderModel> {
@@ -111,17 +118,37 @@ export class LoaderService {
      * @param entityPaginationInput 
      * @returns 
      */
-    async findAndCountAll(entityPaginationInput: DefaultEntityPaginationInput = {}, withoutFilter: boolean = false): Promise<LoaderModelOutput> {
+    async findAndCountAll(
+        entityPaginationInput: DefaultEntityPaginationInput = {},
+        entityFilterInput: DefaultEntityFilterInput[],
+        withoutFilter: boolean = false
+    ): Promise<LoaderModelOutput> {
 
+        let filter = null;
         let result: any;
+
+        if(entityFilterInput.length >= 1) {
+
+            try {
+                this.databaseService.setTableName(this.loaderRepository.metadata.givenTableName);
+                this.databaseService.setEntityFilterInputs(entityFilterInput);
+                filter = await this.databaseService.createFilter();
+            } catch (error) {
+                console.log('error', error);
+            }
+        } else {
+            this.databaseService.setTableName(null);
+            this.databaseService.setEntityFilterInputs(null);
+        }
+
         if(withoutFilter || lodash.isEmpty(entityPaginationInput)) {
 
-            console.log('without filter')
             result = await this.loaderRepository.findAndCount({
 
                 relations: [
                     'config',
-                ]
+                ],
+                where: filter
             });
         } else {
 
@@ -134,7 +161,8 @@ export class LoaderService {
                 take: entityPaginationInput.perPage,
                 order: {
                     [entityPaginationInput.orderField]: entityPaginationInput.sortDirection
-                }
+                },
+                where: filter
             });
         }
 
@@ -148,7 +176,6 @@ export class LoaderService {
 
         if(withoutFilter || lodash.isEmpty(entityPaginationInput)) {
 
-            console.log('without filter')
             return this.loaderRepository.find({
 
                 relations: [

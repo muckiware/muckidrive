@@ -1,8 +1,8 @@
 /**
- * @package     muckiwareDrive
+ * @package     muckiDrive
  * @subpackage  Server
  *
- * @copyright Copyright (C) 2021 by smoppit. All rights reserved.
+ * @copyright Copyright (C) 2021 by muckware. All rights reserved.
  * @license MIT
  * @link https://github.com/muckiware/muckidrive
  */
@@ -12,4 +12,3 @@ export * from './models';
 export * from './services';
 export * from './loader.interface';
 export * from './loader.module';
-//export * from './loader.resolver';

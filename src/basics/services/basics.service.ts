@@ -11,9 +11,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 
 //Import Smoppit sales parts
-import { HelperPathTools } from '../../helper'
-import { DefaultEntityPaginationInput, sortDirections } from '../index'
-import lodash from 'Lodash';
+import { HelperPathTools } from '../../helper';
 
 @Injectable()
 export class BasicsService {

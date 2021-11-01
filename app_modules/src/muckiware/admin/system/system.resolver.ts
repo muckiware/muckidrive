@@ -11,20 +11,20 @@ import { Args, Int, Mutation, Query, Resolver, Subscription, Context } from '@ne
 import { UseGuards, SetMetadata } from '@nestjs/common';
 import { PubSub } from 'apollo-server-express';
 
-import { LoaderModel, LoaderModelOutput, LoaderService } from '@muckidrive/loader'
-import { DefaultEntityPaginationInput, DefaultEntityFilterInput } from '@muckidrive/basics';
+import { LoaderModel, LoaderModelOutput, LoaderService } from '@muckidrive//loader'
+import { DefaultEntityPaginationInput, DefaultEntityFilterInput } from '@muckidrive//basics';
 import { JwtAuthenticationBackendGuard } from '@muckidrive/authentication/backend';
-import { AuthorizationRolesGuard, AuthorizationBackendActions, RoleMetadata } from '@muckidrive/authorization/backend';
+import { AuthorizationRolesGuard, AuthorizationBackendActions, RoleMetadata } from '@muckidrive//authorization/backend';
 import { LoaderGuard } from '@muckidrive/loader';
 
 const pubSub = new PubSub();
 
 @Resolver(of => LoaderModel)
 
-export class MuckiwareAdminInstallsResolver {
+export class MuckiwareAdminSystemResolver {
 
-    public static ruleModule = 'MuckiwareAdminInstallsModule'
-    public static ruleName = 'muckiwareAdminInstalls';
+    public static ruleModule = 'MuckiwareAdminSystemModule'
+    public static ruleName = 'muckiwareAdminSystem';
 
     constructor(
         private readonly loaderService: LoaderService,
@@ -37,7 +37,7 @@ export class MuckiwareAdminInstallsResolver {
     @UseGuards(JwtAuthenticationBackendGuard)
     @UseGuards(AuthorizationRolesGuard)
     @UseGuards(LoaderGuard)
-    @Query(() => LoaderModelOutput, { name: 'adminInstalls', description: 'List of installed modules' })
+    @Query(() => LoaderModelOutput, { name: 'adminSystem', description: 'List of system infos modules' })
     public async adminInstalls(
         @Args({
             name: 'pagination',
@@ -46,12 +46,12 @@ export class MuckiwareAdminInstallsResolver {
         }) entityPaginationInput: DefaultEntityPaginationInput,
         @Args({
             name: 'filter',
-            type: () => [DefaultEntityFilterInput],
+            type: () => DefaultEntityFilterInput,
             nullable: true
-        }) entityFilerInput: DefaultEntityFilterInput[],
+        }) entityFilerInput: DefaultEntityFilterInput,
         @Context() context
     ): Promise<LoaderModelOutput> {
 
-        return this.loaderService.findAndCountAll(entityPaginationInput, entityFilerInput);
+        return this.loaderService.findAndCountAll(entityPaginationInput, null);
     }
 }

@@ -7,7 +7,8 @@
  * @link https://github.com/muckiware/muckidrive
  */
 
- import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
+import * as lodash from 'lodash';
 
 export class HelperStringTools {
 
@@ -21,5 +22,10 @@ export class HelperStringTools {
         }
 	
         throw new Error('Invalid input');
+    }
+
+    public static quoteInput(inputString: string) {
+
+        return lodash.trim(inputString).replace(/[~`!@#$%^&*()+={}\[\];:\'\"<>.,\/\\\?-]/g, '');
     }
 }

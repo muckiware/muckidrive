@@ -14,3 +14,4 @@ export * from './defaultEntity.model';
 export * from './defaultEntity.dto';
 export * from './users.model';
 export * from './users.dto';
+export * from './defaultEntity.filter';

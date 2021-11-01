@@ -8,6 +8,7 @@
  */
 
 import { Field, InputType, registerEnumType } from '@nestjs/graphql';
+import { } from 'typeorm';
 import { IsOptional, MaxLength, MinLength, IsPositive, IsString, IsInt, Min, Max } from 'class-validator';
 
 export enum sortDirections {
@@ -18,6 +19,24 @@ export enum sortDirections {
 }
 
 registerEnumType(sortDirections, { name: 'sortDirections' })
+
+export enum filterOperators {
+    EQ = 'eq',
+    NEQ = 'neq',
+    LIKE = 'like',
+    NLIKE = 'nlike',
+    IN = 'in',
+    NIN = 'nin',
+    NULL = 'null',
+    NNULL = 'nnull',
+    GT = 'gt',
+    LT = 'lt',
+    GTEQ = 'gteq',
+    LTEQ = 'lteq',
+    BETWEEN = 'between'
+}
+
+registerEnumType(filterOperators, { name: 'filterOperators' })
 
 @InputType()
 export class DefaultEntityPaginationInput {
@@ -72,13 +91,43 @@ export class DefaultEntityPaginationInput {
 @InputType()
 export class DefaultEntityFilterInput {
 
-    @Field({ 
+    @Field(type => [DefaultEntityFilterInputItems], { 
         nullable: true,
         description: 'Filter string input'
     })
-    @MinLength(5)
+    @IsOptional()
+    filterDefinition: DefaultEntityFilterInputItems[];
+}
+
+@InputType()
+export class DefaultEntityFilterInputItems {
+
+    @Field({ 
+        nullable: true,
+        description: 'Serach term as string input'
+    })
+    @MinLength(3)
     @MaxLength(255)
     @IsString()
-    @IsOptional()
-    filterDefinition: string;
+    term: string;
+
+    @Field(
+        type => filterOperators,{ 
+            nullable: true,
+            description: 'Operator like equal or not null'
+        }
+    )
+    @MinLength(2)
+    @MaxLength(6)
+    @IsString()
+    operator: filterOperators;
+
+    @Field({ 
+        nullable: true,
+        description: 'Database field'
+    })
+    @MinLength(2)
+    @MaxLength(45)
+    @IsString()
+    field: string;
 }
