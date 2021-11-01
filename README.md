@@ -163,5 +163,39 @@ this.loggerService.error(message: string, loggerContext?: string, extensionConte
 this.loggerService.fatal(message: string, loggerContext?: string, extensionContext?: string);
 ```
 
+## Filter Input Example
+```JAVASCRIPT
+filter: [
+  {
+    filterDefinition: [{
+      term: "logger"
+      operator: LIKE
+      field: "name"
+    },
+    {
+      term: "0"
+      operator: EQ
+      field: "isActive"
+    }]
+  },
+  {
+    filterDefinition: [{
+      term: "admin"
+      operator: LIKE
+      field: "name"
+    }]
+  }
+]
+```
+
+## Pagination Input Example
+```JAVASCRIPT
+pagination: {
+  orderField: "name"
+  perPage: 30
+  pageNumber: 2
+}
+```
+
 ## License
 muckiDrive server is [MIT licensed](LICENSE).
