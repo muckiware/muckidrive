@@ -146,7 +146,7 @@ describe('UsersService', () => {
         });
         
 
-        it('calls the repository with correct paramaters', async () => {
+        it('create user with correct paramaters', async () => {
 
             expect.assertions(2);
       
@@ -184,10 +184,14 @@ describe('UsersService', () => {
             });
       
             jest.spyOn(userRepository, 'save').mockResolvedValue(saveUser);
- 
-            const result = await usersService.create(createUsersData);
-            expect(result.eMail).toEqual(email);
-            expect(result.isActive).toBeTruthy();
+
+            try {
+                let result = await usersService.create(createUsersData);
+                expect(result.eMail).toEqual(email);
+                expect(result.isActive).toBeTruthy();
+            } catch (error) {
+                console.log(error);
+            }
         });
     });
 

@@ -8,7 +8,7 @@
  */
 
 //Import Framework parts
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import {
     Equal,
     Like,
@@ -84,7 +84,7 @@ export class DefaultEntityFilter {
     public setAndFilters(key: string, andFilterValues: {}) {
 
         if(key === '') {
-            throw 'Missing filter key';
+            throw new BadRequestException('Missing filter key input value');
         }
         
         this._andFilters[key] = andFilterValues;
@@ -94,7 +94,7 @@ export class DefaultEntityFilter {
     public getFilterObject(): FindOperator<any> {
 
         if(!this._operator || !this._value) {
-            throw 'Filter parameter incomplete';
+            throw new BadRequestException('Filter parameter incomplete');
         }
 
         switch(this._operator) {
@@ -109,12 +109,12 @@ export class DefaultEntityFilter {
                 return Not(Like('%' + this._value + '%'));
             case 'in':
                 if (!this._value.includes(',')) {
-                    throw 'Unvalid filter input value for -in- operator';
+                    throw new BadRequestException('Unvalid filter input value for -in- operator');
                 }
                 return In(this._value.split(','));
             case 'nin':
                 if (!this._value.includes(',')) {
-                    throw 'Unvalid filter input value for -notin- operator';
+                    throw new BadRequestException('Unvalid filter input value for -notin- operator');
                 }
                 return Not(In(this._value.split(',')));
             case 'null':
@@ -131,12 +131,12 @@ export class DefaultEntityFilter {
                 return LessThanOrEqual(this._value);
             case 'between':
                 if (!this._value.includes(',')) {
-                    throw 'Unvalid filter input value for -between- operator';
+                    throw new BadRequestException('Unvalid filter input value for -between- operator');
                 }
                 var inputValue = this._value.split(',', 2);
                 return Between(inputValue[0], inputValue[1]);
             default:
-                throw 'Missing valid filter operator';
+                throw new BadRequestException('Missing valid filter operator');
         }
     }
 
