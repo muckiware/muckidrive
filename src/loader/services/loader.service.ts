@@ -13,6 +13,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, getConnection, Equal } from 'typeorm';
 import { DateTime } from 'luxon';
 import * as lodash from 'lodash';
+import { validate, ValidationError } from 'class-validator'
 import { HelperStringTools } from '../../helper';
 
 import { LoaderModel, CreateLoaderDto, NewModuleInput, UpdateModuleInput, LoaderModelOutput } from '../../loader';
@@ -33,22 +34,31 @@ export class LoaderService {
         private readonly databaseService: DatabaseService
     ) {}
 
-    public create(systemUserId: number, CreateLoaderDto: NewModuleInput): Promise<LoaderModel> {
+    public async create(systemUserId: number, CreateLoaderDto: NewModuleInput): Promise<LoaderModel> {
+
+        let moduleData = new NewModuleInput();
+        moduleData.name = CreateLoaderDto.name;
+        moduleData.description = CreateLoaderDto.description;
+        moduleData.moduleVersion = CreateLoaderDto.moduleVersion;
+        moduleData.isActive = true;
+        moduleData.author = CreateLoaderDto.author;
+        moduleData.vendor = CreateLoaderDto.vendor;
+        moduleData.license = CreateLoaderDto.license;
+        moduleData.keywords = CreateLoaderDto.keywords;
+        moduleData.homepage = CreateLoaderDto.homepage;
+
+        let validateInputs: ValidationError[] = await validate(moduleData);
+        if(validateInputs.length >= 1) {
+            throw new BadRequestException('Unvalid input data', validateInputs.toString());
+        }
 
         const module = new LoaderModel();
-        module.name = CreateLoaderDto.name;
-        module.description = CreateLoaderDto.description;
-        module.moduleVersion = CreateLoaderDto.moduleVersion;
-        module.isActive = true;
-        module.author = CreateLoaderDto.author;
-        module.vendor = CreateLoaderDto.vendor;
-        module.license = CreateLoaderDto.license;
-        module.keywords = CreateLoaderDto.keywords;
-        module.homepage = CreateLoaderDto.homepage;
+        Object.assign(module, CreateLoaderDto);
+
         module.createDateTime = new Date(DateTime.utc().toString());
         module.createUserId = systemUserId
 
-        return this.loaderRepository.save(module);
+        return await this.loaderRepository.save(module);
     }
 
     public update(moduleId: number, systemUserId: number, CreateLoaderDto: NewModuleInput): Promise<LoaderModel> {

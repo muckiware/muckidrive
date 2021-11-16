@@ -8,7 +8,7 @@
  */
 
 import { Field, InputType } from '@nestjs/graphql';
-import { IsOptional, IsBoolean, MaxLength, MinLength } from 'class-validator';
+import { IsOptional, IsBoolean, MaxLength, MinLength, IsString } from 'class-validator';
 
 export class CreateLoaderDto {
 
@@ -35,6 +35,7 @@ export class CreateLoaderDto {
 export class NewModuleInput {
 
     @Field()
+    @IsString()
     @MinLength(3)
     @MaxLength(250)
     name: string;
