@@ -10,7 +10,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { IsOptional, IsBoolean, MaxLength, MinLength, IsString } from 'class-validator';
 
-export class CreateLoaderDto {
+export class LoaderPropertiesDto {
 
     name: string;
 
@@ -42,10 +42,12 @@ export class NewModuleInput {
 
     @Field({ nullable: true })
     @MinLength(3)
+    @IsString()
     @IsOptional()
     description: string;
 
     @Field()
+    @IsString()
     @MinLength(1)
     @MaxLength(10)
     moduleVersion: string;
@@ -57,29 +59,34 @@ export class NewModuleInput {
     @Field()
     @MinLength(3)
     @MaxLength(250)
+    @IsString()
     @IsOptional()
     author: string;
 
     @Field()
     @MinLength(3)
     @MaxLength(250)
+    @IsString()
     @IsOptional()
     vendor: string;
 
     @Field()
     @MinLength(1)
     @MaxLength(25)
+    @IsString()
     @IsOptional()
     license: string;
 
     @Field()
     @MinLength(3)
+    @IsString()
     @IsOptional()
     keywords: string;
 
     @Field()
     @MinLength(6)
     @MaxLength(250)
+    @IsString()
     @IsOptional()
     homepage: string;
 }

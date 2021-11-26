@@ -1,6 +1,6 @@
 # Description
 
-[muckiDrive](https://github.com/muckiware/muckidrive) server system repository. Basic for data service with GraphQL interface connection.
+[muckiDrive](https://github.com/muckiware/muckidrive) server system repository. A basic foundation for to build headless server applications with GraphQL interface connection. 
 
 ## Features
 - [nest.js](https://nestjs.com) basic and module structures

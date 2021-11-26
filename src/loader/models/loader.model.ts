@@ -64,6 +64,20 @@ export class LoaderModel extends DefaultEntityModel {
     @Field({ nullable: true })
     @Column({ nullable: true })
     homepage: string;
+
+    /**
+     * Static merthod for to create model for testings
+     * 
+     * @param params 
+     * @returns 
+     */
+     public static getModel(params: Partial<LoaderModel>): LoaderModel {
+
+        const loaderModel = new LoaderModel();
+        Object.assign(loaderModel, params);
+    
+        return loaderModel;
+    }
 }
 
 @ObjectType()
@@ -74,4 +88,4 @@ export class LoaderModelOutput {
 
     @Field(() => TPagination)
     pagination: TPagination;
-} 
+}

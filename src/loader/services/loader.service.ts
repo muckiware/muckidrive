@@ -16,7 +16,13 @@ import * as lodash from 'lodash';
 import { validate, ValidationError } from 'class-validator'
 import { HelperStringTools } from '../../helper';
 
-import { LoaderModel, CreateLoaderDto, NewModuleInput, UpdateModuleInput, LoaderModelOutput } from '../../loader';
+import {
+    LoaderModel,
+    LoaderPropertiesDto,
+    NewModuleInput,
+    UpdateModuleInput,
+    LoaderModelOutput
+} from '../../loader';
 import {
     DefaultEntityPaginationInput,
     BasicServicePagination,
@@ -34,18 +40,18 @@ export class LoaderService {
         private readonly databaseService: DatabaseService
     ) {}
 
-    public async create(systemUserId: number, CreateLoaderDto: NewModuleInput): Promise<LoaderModel> {
+    public async create(systemUserId: number, loaderProperties: NewModuleInput): Promise<LoaderModel> {
 
         let moduleData = new NewModuleInput();
-        moduleData.name = CreateLoaderDto.name;
-        moduleData.description = CreateLoaderDto.description;
-        moduleData.moduleVersion = CreateLoaderDto.moduleVersion;
+        moduleData.name = loaderProperties.name;
+        moduleData.description = loaderProperties.description;
+        moduleData.moduleVersion = loaderProperties.moduleVersion;
         moduleData.isActive = true;
-        moduleData.author = CreateLoaderDto.author;
-        moduleData.vendor = CreateLoaderDto.vendor;
-        moduleData.license = CreateLoaderDto.license;
-        moduleData.keywords = CreateLoaderDto.keywords;
-        moduleData.homepage = CreateLoaderDto.homepage;
+        moduleData.author = loaderProperties.author;
+        moduleData.vendor = loaderProperties.vendor;
+        moduleData.license = loaderProperties.license;
+        moduleData.keywords = loaderProperties.keywords;
+        moduleData.homepage = loaderProperties.homepage;
 
         let validateInputs: ValidationError[] = await validate(moduleData);
         if(validateInputs.length >= 1) {
@@ -53,7 +59,7 @@ export class LoaderService {
         }
 
         const module = new LoaderModel();
-        Object.assign(module, CreateLoaderDto);
+        Object.assign(module, loaderProperties);
 
         module.createDateTime = new Date(DateTime.utc().toString());
         module.createUserId = systemUserId
@@ -61,19 +67,28 @@ export class LoaderService {
         return await this.loaderRepository.save(module);
     }
 
-    public update(moduleId: number, systemUserId: number, CreateLoaderDto: NewModuleInput): Promise<LoaderModel> {
+    public async update(moduleId: number, systemUserId: number, loaderProperties: UpdateModuleInput): Promise<LoaderModel> {
+
+        const moduleData = new LoaderModel();
+        moduleData.id = moduleId;
+        moduleData.name = loaderProperties.name;
+        moduleData.description = loaderProperties.description;
+        moduleData.moduleVersion = loaderProperties.moduleVersion;
+        moduleData.isActive = true;
+        moduleData.author = loaderProperties.author;
+        moduleData.vendor = loaderProperties.vendor;
+        moduleData.license = loaderProperties.license;
+        moduleData.keywords = loaderProperties.keywords;
+        moduleData.homepage = loaderProperties.homepage;
+
+        let validateInputs: ValidationError[] = await validate(moduleData);
+        if(validateInputs.length >= 1) {
+            throw new BadRequestException('Unvalid input data', validateInputs.toString());
+        }
 
         const module = new LoaderModel();
-        module.id = moduleId;
-        module.name = CreateLoaderDto.name;
-        module.description = CreateLoaderDto.description;
-        module.moduleVersion = CreateLoaderDto.moduleVersion;
-        module.isActive = true;
-        module.author = CreateLoaderDto.author;
-        module.vendor = CreateLoaderDto.vendor;
-        module.license = CreateLoaderDto.license;
-        module.keywords = CreateLoaderDto.keywords;
-        module.homepage = CreateLoaderDto.homepage;
+        Object.assign(module, loaderProperties);
+
         module.updateDateTime = new Date(DateTime.utc().toString());
         module.updateUserId = systemUserId
 

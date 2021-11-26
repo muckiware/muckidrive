@@ -17,7 +17,12 @@ import faker, { fake } from 'faker';
 import { validate } from 'class-validator'
 import { DateTime } from 'luxon';
 
-import { LoaderService, LoaderModel, CreateLoaderDto, NewModuleInput } from '../../../src/loader';
+import {
+    LoaderService,
+    LoaderModel,
+    NewModuleInput,
+    UpdateModuleInput
+} from '../../../src/loader';
 import { BasicServicePagination, DatabaseService } from '../../../src/basics';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
@@ -71,7 +76,7 @@ describe('LoaderService', () => {
         loaderRepository = moduleRef.get(getRepositoryToken(LoaderModel));
     });
  
-    describe('Create new module item', () => {
+    describe('Update items for module', () => {
 
         const systemUserId = 1;
 
@@ -96,10 +101,8 @@ describe('LoaderService', () => {
                 createModuleData.name = null;
                 try {
                     let result: LoaderModel = await loaderService.create(systemUserId, createModuleData);
-                    console.log('result output', result);
                 } catch (error) {
 
-                    console.log('error output', error);
                     expect(error).toBeInstanceOf(BadRequestException);
                     expect(error.message).toBe('Unvalid input data');
                 }
@@ -109,6 +112,21 @@ describe('LoaderService', () => {
 
             it('throws an error when name is too short', async () => {
 
+                createModuleData.name = faker.lorem.word(2);
+                try {
+                    let result: LoaderModel = await loaderService.create(systemUserId, createModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                createModuleData.name = faker.lorem.word(10);
+            });
+
+            it('throws an error when name is too long', async () => {
+
+                createModuleData.name = faker.lorem.word(280);
                 try {
                     let result: LoaderModel = await loaderService.create(systemUserId, createModuleData);
                 } catch (error) {
@@ -121,53 +139,300 @@ describe('LoaderService', () => {
             });
         });
 
+        describe('Checkup module description input', () => {
 
-        // it('create user with correct paramaters', async () => {
+            expect.assertions(2);
 
-        //     expect.assertions(2);
+            it('throws an error when desc is too short', async () => {
+
+                createModuleData.description = faker.lorem.word(2);
+                try {
+                    let result: LoaderModel = await loaderService.create(systemUserId, createModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                createModuleData.description = faker.lorem.word(10);
+            });
+        });
+
+        describe('Checkup module isActive input', () => {
+
+            expect.assertions(2);
+
+            it('throws an error when isActive is null', async () => {
+
+                createModuleData.isActive = null;
+                try {
+                    let result: LoaderModel = await loaderService.create(systemUserId, createModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                createModuleData.isActive = true;
+            });
+        });
+
+        describe('Checkup module moduleVersion input', () => {
+
+            expect.assertions(2);
+
+            it('throws an error when moduleVersion is emtpy', async () => {
+
+                createModuleData.moduleVersion = '';
+                try {
+                    let result: LoaderModel = await loaderService.create(systemUserId, createModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                createModuleData.moduleVersion = faker.lorem.word(10)
+            });
+
+            it('throws an error when moduleVersion is too long', async () => {
+
+                createModuleData.moduleVersion = faker.lorem.word(11);
+                try {
+                    let result: LoaderModel = await loaderService.create(systemUserId, createModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                createModuleData.moduleVersion = faker.lorem.word(10)
+            });
+        });
+
+        describe('Checkup module author input', () => {
+
+            expect.assertions(2);
+
+            it('throws an error when author is emtpy', async () => {
+
+                createModuleData.moduleVersion = '';
+                try {
+                    let result: LoaderModel = await loaderService.create(systemUserId, createModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                createModuleData.author = faker.name.firstName() + ' ' + faker.name.lastName()
+            });
+
+            it('throws an error when author is too short', async () => {
+
+                createModuleData.author = faker.lorem.word(2);
+                try {
+                    let result: LoaderModel = await loaderService.create(systemUserId, createModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                createModuleData.author = faker.name.firstName() + ' ' + faker.name.lastName()
+            });
+
+            it('throws an error when author is too long', async () => {
+
+                createModuleData.author = faker.lorem.word(290);
+                try {
+                    let result: LoaderModel = await loaderService.create(systemUserId, createModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                createModuleData.author = faker.name.firstName() + ' ' + faker.name.lastName()
+            });
+        });
+
+        it('create module with correct paramaters', async () => {
+
+            expect.assertions(2);
+
+            const name = faker.lorem.word(10);
+
+            const createModuleData: any = {
+                id: 1,
+                description: faker.lorem.words(14),
+                moduleVersion: faker.lorem.word(10),
+                isActive: true,
+                author: faker.name.firstName() + ' ' + faker.name.lastName(),
+                vendor: faker.company.companyName(),
+                license: faker.lorem.word(4),
+                keywords: faker.lorem.words(12),
+                homepage: faker.internet.url(),
+                name,
+            };
+
+            const saveModule = LoaderModel.getModel({
+                id: 1,
+                name: name,
+                description: faker.lorem.words(14),
+                moduleVersion: faker.lorem.word(10),
+                isActive: true,
+                author: faker.name.firstName() + ' ' + faker.name.lastName(),
+                vendor: faker.company.companyName(),
+                license: faker.lorem.word(4),
+                keywords: faker.lorem.words(12),
+                homepage: faker.internet.url()
+            });
       
-        //     const email = faker.internet.email();
+            jest.spyOn(loaderRepository, 'save').mockResolvedValue(saveModule);
 
-        //     const createUsersData: any = {
-        //         id: 1,
-        //         name: faker.lorem.word(),
-        //         uuid: faker.datatype.uuid(),
-        //         eMail: faker.internet.email(),
-        //         userName: faker.lorem.word(10),
-        //         firstName: faker.name.firstName(1),
-        //         lastName: faker.name.lastName(1),
-        //         password: faker.internet.password(10),
-        //         isActive: true,
-        //         isSystemUser: false,
-        //         isAdminUser: true,
-            //     languageId: 1,
-            //     email,
-            // };
+            try {
+                let result = await loaderService.create(systemUserId, createModuleData);
+                expect(result.name).toEqual(name);
+                expect(result.isActive).toBeTruthy();
+            } catch (error) {
+                console.log('error create module:', error);
+            }
+        });
+    });
 
-            // const saveUser = UsersModel.getModel({
-            //     id: 1,
-            //     name: faker.lorem.word(),
-            //     uuid: faker.datatype.uuid(),
-            //     eMail: email,
-            //     userName: faker.lorem.word(10),
-            //     firstName: faker.name.firstName(1),
-            //     lastName: faker.name.lastName(1),
-            //     password: faker.internet.password(10),
-            //     isActive: true,
-            //     isSystemUser: false,
-            //     isAdminUser: true,
-            //     languageId: 1
-            // });
-      
-            // jest.spyOn(userRepository, 'save').mockResolvedValue(saveUser);
+    describe('Update items for module', () => {
 
-            // try {
-            //     let result = await usersService.create(createUsersData);
-            //     expect(result.eMail).toEqual(email);
-            //     expect(result.isActive).toBeTruthy();
-            // } catch (error) {
-            //     console.log(error);
-            // }
-        // });
+        const systemUserId = 1;
+
+        const updateModuleData: UpdateModuleInput = {
+            name: faker.lorem.word(10),
+            description: faker.lorem.words(14),
+            moduleVersion: faker.lorem.word(10),
+            isActive: true,
+            author: faker.name.firstName() + ' ' + faker.name.lastName(),
+            vendor: faker.company.companyName(),
+            license: faker.lorem.word(4),
+            keywords: faker.lorem.words(12),
+            homepage: faker.internet.url()
+        };
+
+        describe('Checkup name input for module', () => {
+
+            expect.assertions(2);
+
+            it('throws an error when name is null', async () => {
+
+                updateModuleData.name = null;
+                try {
+                    let result: LoaderModel = await loaderService.update(1, systemUserId, updateModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                updateModuleData.name = faker.lorem.word(10);
+            });
+
+            it('throws an error when name is too short', async () => {
+
+                updateModuleData.name = faker.lorem.word(2);
+                try {
+                    let result: LoaderModel = await loaderService.update(1, systemUserId, updateModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                updateModuleData.name = faker.lorem.word(10);
+            });
+
+            it('throws an error when name is too long', async () => {
+
+                updateModuleData.name = faker.lorem.word(280);
+                try {
+                    let result: LoaderModel = await loaderService.update(1, systemUserId, updateModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                updateModuleData.name = faker.lorem.word(10);
+            });
+        });
+
+        describe('Checkup for module description input', () => {
+
+            expect.assertions(2);
+
+            it('throws an error when desc is too short', async () => {
+
+                updateModuleData.description = faker.lorem.word(2);
+                try {
+                    let result: LoaderModel = await loaderService.update(1, systemUserId, updateModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                updateModuleData.description = faker.lorem.word(10);
+            });
+        });
+
+        describe('Checkup module isActive input', () => {
+
+            expect.assertions(2);
+
+            it('throws an error when isActive is null', async () => {
+
+                updateModuleData.isActive = null;
+                try {
+                    let result: LoaderModel = await loaderService.update(1, systemUserId, updateModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                updateModuleData.isActive = true;
+            });
+        });
+
+        describe('Checkup module moduleVersion input', () => {
+
+            expect.assertions(2);
+
+            it('throws an error when moduleVersion is empty', async () => {
+
+                updateModuleData.moduleVersion = '';
+                try {
+                    let result: LoaderModel = await loaderService.update(1, systemUserId, updateModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                updateModuleData.moduleVersion = faker.lorem.word(10);
+            });
+
+            it('throws an error when moduleVersion is too long', async () => {
+
+                updateModuleData.moduleVersion = faker.lorem.word(11);
+                try {
+                    let result: LoaderModel = await loaderService.update(1, systemUserId, updateModuleData);
+                } catch (error) {
+
+                    expect(error).toBeInstanceOf(BadRequestException);
+                    expect(error.message).toBe('Unvalid input data');
+                }
+
+                updateModuleData.moduleVersion = faker.lorem.word(10);
+            });
+        });
     });
 });
