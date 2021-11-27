@@ -87,6 +87,30 @@ export class MyCustomService  {
 ```
 
 The value can be typed with string, number, float or boolean. 
+## Events
+muckiDrive offers you various events for application actions
+
+### Overview
+| Event | Trigger Ident | Description |
+| :--- | :---- | :--- |
+| Create new loader module | loader.create.before | Triggers Event before for to creates a new module |
+| Create new loader module | loader.create.after | Triggers Event after for to creates a new module |
+| Update loader module | loader.update.before | Triggers Event before for to updates a existing module |
+| Update loader module | loader.update.after | Triggers Event after for to updates a existing module |
+
+### Subscribe
+The example shows, how you can subscribe an event in your class.
+```JAVASCRIPT
+import { OnEvent } from '@nestjs/event-emitter';
+
+export class MyCreatedListener {
+
+    @OnEvent('loader.create.after')
+    handleLoaderCreatedEvent(event: LoaderCreateEvent) {
+        //Do something with event object
+    }
+}
+```
 ## loggings
 For to create logging items in your modules, offers muckidrive an logging service as interface. This service creates logging files into the subfolder var/log. It will use log rotation by configure the maximun number of files and file size of earch log. 
 

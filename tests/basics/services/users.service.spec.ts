@@ -154,7 +154,7 @@ describe('UsersService', () => {
 
             const createUsersData: any = {
                 id: 1,
-                name: faker.lorem.word(),
+                name: faker.lorem.word(10),
                 uuid: faker.datatype.uuid(),
                 eMail: faker.internet.email(),
                 userName: faker.lorem.word(10),
@@ -170,7 +170,7 @@ describe('UsersService', () => {
 
             const saveUser = UsersModel.getModel({
                 id: 1,
-                name: faker.lorem.word(),
+                name: faker.lorem.word(10),
                 uuid: faker.datatype.uuid(),
                 eMail: email,
                 userName: faker.lorem.word(10),
@@ -228,7 +228,7 @@ describe('UsersService', () => {
     
             const existingUser = UsersModel.getModel({
                 id: id,
-                name: faker.lorem.word(),
+                name: faker.lorem.word(10),
                 uuid: faker.datatype.uuid(),
                 eMail: email,
                 userName: faker.lorem.word(10),

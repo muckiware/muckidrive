@@ -7,6 +7,7 @@
  * @link https://github.com/muckiware/muckidrive
  */
 
+export * from './events';
 export * from './guards';
 export * from './models';
 export * from './services';

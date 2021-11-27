@@ -10,6 +10,7 @@
 import { Module, Global, CacheModule, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { DatabaseModule } from './database.module'
 import configuration from './config/configuration';
@@ -48,7 +49,16 @@ import { LoggerService, LoggerModule } from './logging';
         ),
         LoaderModule.loadModules(),
         InitModule,
-        CacheModule.register()
+        CacheModule.register(),
+        EventEmitterModule.forRoot({
+            wildcard: false,
+            delimiter: '.',
+            newListener: false,
+            removeListener: false,
+            maxListeners: 30,
+            verboseMemoryLeak: false,
+            ignoreErrors: false,
+        })
     ],
     controllers: [],
     providers: [

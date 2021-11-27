@@ -8,6 +8,7 @@
  */
 
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Reflector } from '@nestjs/core';
 import { ConfigService} from '@nestjs/config';
@@ -41,9 +42,12 @@ class BasicServicePaginationMock {
     }
 }
 
-class DatabaseServiceMock {
+class DatabaseServiceMock {}
+class EventEmitterMock {
 
-
+    public emit(event: symbol|string, data: any) {
+        return 1;
+    }
 }
 
 describe('LoaderService', () => {
@@ -68,6 +72,10 @@ describe('LoaderService', () => {
                 {
                     provide: DatabaseService,
                     useClass: DatabaseServiceMock,
+                },
+                {
+                    provide: EventEmitter2,
+                    useClass: EventEmitterMock,
                 }
             ],
         }).compile();
@@ -76,7 +84,7 @@ describe('LoaderService', () => {
         loaderRepository = moduleRef.get(getRepositoryToken(LoaderModel));
     });
  
-    describe('Update items for module', () => {
+    describe('Create items for module', () => {
 
         const systemUserId = 1;
 
@@ -306,6 +314,7 @@ describe('LoaderService', () => {
         const systemUserId = 1;
 
         const updateModuleData: UpdateModuleInput = {
+            id: 1,
             name: faker.lorem.word(10),
             description: faker.lorem.words(14),
             moduleVersion: faker.lorem.word(10),

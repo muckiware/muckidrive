@@ -10,11 +10,13 @@
 //Import Framework parts
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Repository, getConnection, Equal } from 'typeorm';
 import { DateTime } from 'luxon';
 import * as lodash from 'lodash';
 import { validate, ValidationError } from 'class-validator'
 import { HelperStringTools } from '../../helper';
+import { LoaderCreateEvent } from '../index';
 
 import {
     LoaderModel,
@@ -37,7 +39,8 @@ export class LoaderService {
         @InjectRepository(LoaderModel)
         private readonly loaderRepository: Repository<LoaderModel>,
         private readonly basicServicePagination: BasicServicePagination,
-        private readonly databaseService: DatabaseService
+        private readonly databaseService: DatabaseService,
+        private eventEmitter: EventEmitter2
     ) {}
 
     public async create(systemUserId: number, loaderProperties: NewModuleInput): Promise<LoaderModel> {
@@ -59,17 +62,26 @@ export class LoaderService {
         }
 
         const module = new LoaderModel();
-        Object.assign(module, loaderProperties);
+        Object.assign(module, moduleData);
 
         module.createDateTime = new Date(DateTime.utc().toString());
         module.createUserId = systemUserId
 
-        return await this.loaderRepository.save(module);
+        const loaderCreateBeforeEvent = new LoaderCreateEvent();
+        this.eventEmitter.emit('loader.create.before', module);
+
+        let result = await this.loaderRepository.save(module);
+
+        const loaderCreateAfterEvent = new LoaderCreateEvent();
+        this.eventEmitter.emit('loader.create.after', result);
+
+        return result;
     }
 
     public async update(moduleId: number, systemUserId: number, loaderProperties: UpdateModuleInput): Promise<LoaderModel> {
 
-        const moduleData = new LoaderModel();
+        // const moduleData = new UpdateModuleInput();
+        let moduleData = new LoaderModel();
         moduleData.id = moduleId;
         moduleData.name = loaderProperties.name;
         moduleData.description = loaderProperties.description;
@@ -87,15 +99,22 @@ export class LoaderService {
         }
 
         const module = new LoaderModel();
-        Object.assign(module, loaderProperties);
+        Object.assign(module, moduleData);
 
         module.updateDateTime = new Date(DateTime.utc().toString());
         module.updateUserId = systemUserId
 
-        return this.loaderRepository.save(module);
+        this.eventEmitter.emit('loader.update.before', module);
+        let result = this.loaderRepository.save(module);
+        this.eventEmitter.emit('loader.update.before', result);
+        return result;
     }
 
     async resetModuleStatus(systemUserId: number) {
+
+        if(systemUserId <= 0) {
+            throw new BadRequestException('Unvalid input data', 'systemUserId <= is not allowed');
+        }
 
         await getConnection()
             .createQueryBuilder()
@@ -224,9 +243,13 @@ export class LoaderService {
     }
 
     public removeByName(moduleName: string) {
-        
+
+        if(moduleName === '') {
+            throw new BadRequestException('Unvalid input data', 'Empty modulename is not allowed');
+        }
+
         this.loaderRepository.delete({
             name: Equal(moduleName)
         });
     }
- }
+}
