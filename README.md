@@ -1,3 +1,4 @@
+![muckidrive logo](https://raw.githubusercontent.com/muckiware/muckidrive/main/var/logo_256x256.png)
 # Description
 
 [muckiDrive](https://github.com/muckiware/muckidrive) server system repository. A basic foundation for to build headless server applications with GraphQL interface connection. 
@@ -21,7 +22,7 @@ $ npm install
 
 ```bash
 # start server application
-$ nest start
+$ npm start
 ```
 
 # Testing the server
@@ -58,7 +59,7 @@ auth:
     jwt:
       secret: 'my_random_jwt_secret_key'
       signOptions:
-        expiresIn: '20s' #Eg: 60, "2 days", "10h", "7d"
+        expiresIn: '20s' #eg: 60, "2 days", "10h", "7d"
 ```
 
 # Usage
