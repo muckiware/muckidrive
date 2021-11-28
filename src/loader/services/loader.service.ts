@@ -178,7 +178,7 @@ export class LoaderService {
                 this.databaseService.setEntityFilterInputs(entityFilterInput);
                 filter = await this.databaseService.createFilter();
             } catch (error) {
-                console.log('error', error);
+                throw new BadRequestException('Unvalid create filter', error);
             }
         } else {
             this.databaseService.setTableName(null);
@@ -248,8 +248,10 @@ export class LoaderService {
             throw new BadRequestException('Unvalid input data', 'Empty modulename is not allowed');
         }
 
+        this.eventEmitter.emit('loader.remove.before', moduleName);
         this.loaderRepository.delete({
             name: Equal(moduleName)
         });
+        this.eventEmitter.emit('loader.remove.before', moduleName);
     }
 }

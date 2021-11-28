@@ -97,6 +97,8 @@ muckiDrive offers you various events for application actions
 | Create new loader module | loader.create.after | Triggers Event after for to creates a new module |
 | Update loader module | loader.update.before | Triggers Event before for to updates a existing module |
 | Update loader module | loader.update.after | Triggers Event after for to updates a existing module |
+| Remove loader module | loader.remove.before | Triggers Event before for to remove a existing module |
+| Remove loader module | loader.remove.after | Triggers Event after for to remove a existing module |
 
 ### Subscribe
 The example shows, how you can subscribe an event in your class.
