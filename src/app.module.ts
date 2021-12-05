@@ -11,6 +11,7 @@ import { Module, Global, CacheModule, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 import { DatabaseModule } from './database.module'
 import configuration from './config/configuration';
@@ -18,6 +19,7 @@ import { BasicsModule } from './basics/basics.module';
 import { GraphQLApiModule } from './graphql/graphql.module';
 import { HelperPathTools } from './helper';
 import { ModuleConfigService } from './config';
+import { join } from 'path';
 
 import { 
     LoaderModel,
@@ -58,7 +60,11 @@ import { LoggerService, LoggerModule } from './logging';
             maxListeners: 30,
             verboseMemoryLeak: false,
             ignoreErrors: false,
-        })
+        }),
+        ServeStaticModule.forRoot({
+            rootPath: join(__dirname, '..', 'masterApp'),
+            serveRoot: '/admin'
+        }),
     ],
     controllers: [],
     providers: [
