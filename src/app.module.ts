@@ -9,7 +9,7 @@
 
 import { Module, Global, CacheModule, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 
@@ -33,7 +33,6 @@ import { InitModule } from './init';
 import { AuthenticationBackendModule } from './authentication/backend/authentication.module';
 import { AuthorizationBackendModule } from './authorization/backend/authorization.module';
 import { LoggerService, LoggerModule } from './logging';
-
 @Global()
 @Module({
     imports: [
@@ -61,10 +60,14 @@ import { LoggerService, LoggerModule } from './logging';
             verboseMemoryLeak: false,
             ignoreErrors: false,
         }),
-        ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '..', 'masterApp'),
-            serveRoot: '/admin'
-        }),
+        ServeStaticModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => [{
+                rootPath: join(__dirname, '..', 'masterApp'),
+                serveRoot: '/' + configService.get<string>('http.masterAppPath')
+            }],
+        })
     ],
     controllers: [],
     providers: [

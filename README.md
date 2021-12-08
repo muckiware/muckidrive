@@ -38,6 +38,7 @@ $ npm run test
 http:
   host: '127.0.0.1'
   port: 3000
+  masterAppPath: 'admin'
 
 db:
   type: 'mysql'
@@ -49,7 +50,7 @@ db:
   entityPrefix: 'random_prefix_'
   logging: false
 
-grapgql:
+graphql:
   debug: false
   playground: true
   schemaPath: './var/etc/schema.gql'
@@ -62,6 +63,24 @@ auth:
         expiresIn: '20s' #eg: 60, "2 days", "10h", "7d"
 ```
 
+| Key | Description | Example | Data Type |
+| :---| :--- | :--- |:--- |
+| http.host | host of system, on which the application is runing | 127.0.0.1 | string |
+| http.port | Port on which the server application should be running | 8082 | integer |
+| http.masterAppPath | Path on which the server administration should be running | admin | string |
+| db.type | The type of database instance. Usually should that be MySQL/MariaDB | mysql | string |
+| db.url | Connection address of the database instance. | localhost | string|
+| db.port | Port connection of the database instance. | 3306 | integer |
+| db.database | Name of the database instance. | myserverapplication | string |
+| db.username | User name of the database to get access to the tables. | mysqluser | string |
+| db.password | User password of the database to get access to the tables. | Random string | string |
+| db.entityPrefix | Can be use to add to all database table names a prefix like this: prefix_mytable. | prefix_ | string |
+| db.logging | Can be use to get debugging outputs of the database. | false | boolean |
+| graphql.debug | Can be use to get debugging outputs of the graphql API output. | false | boolean |
+| graphql.playground | Enables the playground for to testing the graphql API | false | boolean |
+| graphql.schemaPath | Relative path in local file system for to save the GraphQL definition file | ./var/etc/schema.gql | string |
+| auth.backend.jwt.secret | Key which will be used by creating user tokens as signatur | Random string | string |
+| auth.backend.jwt.signOptions.expiresIn | Time how long the user tokens after login actions should be valid | 1h | string |
 # Usage
 ## Module configurations
 Each module can save and can unlimit key/value pairs. It will saved in a database table and served of a cached storage.

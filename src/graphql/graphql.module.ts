@@ -9,10 +9,9 @@
 
 import { Module, OnModuleInit } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ConfigModule, ConfigService} from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import * as path from 'path';
-// import { HelperFileTools } from '@muckidrive/helper';
 import { HelperFileTools } from '../helper';
 
 @Module({
@@ -21,10 +20,10 @@ import { HelperFileTools } from '../helper';
             imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => ({
-                debug: configService.get<boolean>('grapgql.debug'),
-                playground: configService.get<boolean>('grapgql.playground'),
+                debug: configService.get<boolean>('graphql.debug'),
+                playground: configService.get<boolean>('graphql.playground'),
                 installSubscriptionHandlers: true,
-                autoSchemaFile: configService.get<string>('grapgql.schemaPath')
+                autoSchemaFile: configService.get<string>('graphql.schemaPath')
             }),
             
         })
