@@ -9,15 +9,12 @@
 
 import { Args, Int, Mutation, Query, Resolver, Subscription, Context } from '@nestjs/graphql';
 import { UseGuards, SetMetadata } from '@nestjs/common';
-import { PubSub } from 'apollo-server-express';
 
 import { LoaderModel, LoaderModelOutput, LoaderService } from '@muckidrive//loader'
 import { DefaultEntityPaginationInput, DefaultEntityFilterInput } from '@muckidrive//basics';
 import { JwtAuthenticationBackendGuard } from '@muckidrive/authentication/backend';
 import { AuthorizationRolesGuard, AuthorizationBackendActions, RoleMetadata } from '@muckidrive//authorization/backend';
 import { LoaderGuard } from '@muckidrive/loader';
-
-const pubSub = new PubSub();
 
 @Resolver(of => LoaderModel)
 
