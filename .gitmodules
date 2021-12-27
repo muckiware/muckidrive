@@ -1,0 +1,3 @@
+[submodule "src/masterApp"]
+	path = src/masterApp
+	url = git@github.com:muckiware/muckidriveMaster.git
