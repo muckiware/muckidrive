@@ -27,7 +27,12 @@
         "app_modules/src/*"
       ]
     },
-    "allowJs": true
+    "allowJs": true,
+    "lib": [
+      "es2017",
+      "dom",
+      "esnext.asynciterable"
+    ]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
