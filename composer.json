@@ -4,6 +4,7 @@
     "require": {
         "composer-runtime-api": "^2.0",
         "muckiware/master": "*",
+        "shopware/conflicts": "*",
         "shopware/core": "~v6.7.0",
         "symfony/flex": "~2"
     },
@@ -35,7 +36,7 @@
             "App\\": "src/"
         }
     },
-    "minimum-stability": "RC",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
         "allow-plugins": {
