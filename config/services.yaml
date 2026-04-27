@@ -1,0 +1,33 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    shopware.store.frw: '1'
+    default_cdn_strategy: 'physical_filename'
+    shopware.cdn.strategy: '%env(default:default_cdn_strategy:SHOPWARE_CDN_STRATEGY_DEFAULT)%'
+
+    # Pfad-Basis, die in custom Route-Imports verwendet werden kann.
+    # Standard: setze hier '/var/www/html' wenn du das explizit möchtest,
+    # oder nutze die ENV-Variante (siehe zweite Zeile) und setze MUCKIWARE_ROOT in deiner .env oder Umgebung.
+    # Beispiel statisch: muckiware.root: '/var/www/html'
+    # Beispiel mit ENV (empfohlen):
+    muckiware.root: '%env(resolve:MUCKIWARE_ROOT)%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        # Binding arguments by name or type
+        # https://symfony.com/doc/current/service_container.html#binding-arguments-by-name-or-type
+        #bind:
+        #    'bool $isDebug': '%kernel.debug%'
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
