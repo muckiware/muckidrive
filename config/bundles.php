@@ -1,0 +1,18 @@
+<?php
+
+return [
+    Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
+    Muckiware\Core\Framework\Framework::class => ['all' => true],
+    Muckiware\Core\System\System::class => ['all' => true],
+    Muckiware\Core\Content\Content::class => ['all' => true],
+//    Shopware\Core\Checkout\Checkout::class => ['all' => true],
+    Shopware\Core\Maintenance\Maintenance::class => ['all' => true],
+    Shopware\Core\DevOps\DevOps::class => ['e2e' => true],
+    Shopware\Core\Profiling\Profiling::class => ['all' => true],
+    Shopware\Core\Service\Service::class => ['all' => true],
+    Symfony\Bundle\TwigBundle\TwigBundle::class => ['all' => true],
+    Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
+    Symfony\Bundle\DebugBundle\DebugBundle::class => ['dev' => true],
+    Pentatrion\ViteBundle\PentatrionViteBundle::class => ['all' => true],
+    Muckiware\Master\Administration::class => ['all' => true]
+];
