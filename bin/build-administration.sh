@@ -88,7 +88,12 @@ echo "ADMIN_ROOT ${ADMIN_ROOT}"
 # Dump entity schema
 if [[ -z "${SHOPWARE_SKIP_ENTITY_SCHEMA_DUMP:-""}" ]] && [[ -f "${ADMIN_ROOT}"/Resources/app/administration/scripts/entitySchemaConverter/entity-schema-converter.ts ]]; then
   mkdir -p "${ADMIN_ROOT}"/Resources/app/administration/test/_mocks_
-  "${BIN_TOOL[@]}" -e prod framework:schema -s 'entity-schema' "${ADMIN_ROOT}"/Resources/app/administration/test/_mocks_/entity-schema.json
+  SCHEMA_FILE="${ADMIN_ROOT}/Resources/app/administration/test/_mocks_/entity-schema.json"
+  # `ddev exec` runs in the project root inside the container, where the host path does not exist
+  if [[ "${BIN_TOOL[0]}" == "ddev" ]]; then
+    SCHEMA_FILE="${SCHEMA_FILE#"${PROJECT_ROOT}"/}"
+  fi
+  "${BIN_TOOL[@]}" -e prod framework:schema -s 'entity-schema' "${SCHEMA_FILE}"
   (cd "${ADMIN_ROOT}"/Resources/app/administration && npm run convert-entity-schema)
 fi
 
