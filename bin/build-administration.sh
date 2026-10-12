@@ -32,19 +32,27 @@ else
     ADMIN_ROOT="${ADMIN_ROOT:-"${PROJECT_ROOT}/vendor/muckiware/master"}"
 fi
 
-BIN_TOOL="${CWD}/console"
-
+# Determine how to invoke PHP console commands.
+# Inside DDEV container ($IS_DDEV_PROJECT is set): use the local console directly.
+# Outside DDEV, with ddev available: delegate PHP calls through `ddev exec` so
+# that the correct PHP 8.4 runtime is used (the host may only have PHP 7.x/8.2).
+# In CI: use the ci binary as before.
 if [[ ${CI:-""} ]]; then
-    BIN_TOOL="${CWD}/ci"
-
-    if [[ ! -x "$BIN_TOOL" ]]; then
-        chmod +x "$BIN_TOOL"
+    BIN_TOOL=("${CWD}/ci")
+    if [[ ! -x "${BIN_TOOL[0]}" ]]; then
+        chmod +x "${BIN_TOOL[0]}"
     fi
+elif [[ -n "${IS_DDEV_PROJECT:-}" ]]; then
+    BIN_TOOL=("${CWD}/console")
+elif command -v ddev >/dev/null 2>&1; then
+    BIN_TOOL=(ddev exec bin/console)
+else
+    BIN_TOOL=("${CWD}/console")
 fi
 
 # build admin
-[[ ${SHOPWARE_SKIP_BUNDLE_DUMP:-""} ]] || "${BIN_TOOL}" bundle:dump
-"${BIN_TOOL}" feature:dump || true
+[[ ${SHOPWARE_SKIP_BUNDLE_DUMP:-""} ]] || "${BIN_TOOL[@]}" bundle:dump
+"${BIN_TOOL[@]}" feature:dump || true
 
 if [[ $(command -v jq) ]]; then
     OLDPWD=$(pwd)
@@ -80,9 +88,9 @@ echo "ADMIN_ROOT ${ADMIN_ROOT}"
 # Dump entity schema
 if [[ -z "${SHOPWARE_SKIP_ENTITY_SCHEMA_DUMP:-""}" ]] && [[ -f "${ADMIN_ROOT}"/Resources/app/administration/scripts/entitySchemaConverter/entity-schema-converter.ts ]]; then
   mkdir -p "${ADMIN_ROOT}"/Resources/app/administration/test/_mocks_
-  "${BIN_TOOL}" -e prod framework:schema -s 'entity-schema' "${ADMIN_ROOT}"/Resources/app/administration/test/_mocks_/entity-schema.json
+  "${BIN_TOOL[@]}" -e prod framework:schema -s 'entity-schema' "${ADMIN_ROOT}"/Resources/app/administration/test/_mocks_/entity-schema.json
   (cd "${ADMIN_ROOT}"/Resources/app/administration && npm run convert-entity-schema)
 fi
 
 (cd "${ADMIN_ROOT}"/Resources/app/administration && rm -rdf public/bundles && npm run build)
-[[ ${SHOPWARE_SKIP_ASSET_COPY:-""} ]] ||"${BIN_TOOL}" assets:install
+[[ ${SHOPWARE_SKIP_ASSET_COPY:-""} ]] || "${BIN_TOOL[@]}" assets:install
