@@ -53,7 +53,8 @@ COPY custom/muckiware ./custom/muckiware
 ARG FACILITY_PLUGIN_REF=v0.7.0
 ARG LOG_PLUGIN_REF=v2.4.0
 ARG RESTIC_LIB_REF=v1.5.0
-RUN git clone --depth 1 --branch ${FACILITY_PLUGIN_REF} https://github.com/muckiware/MuckiFacilityPlugin.git custom/plugins/MuckiFacilityPlugin \
+RUN rm -rf custom/muckiware/restic custom/plugins/MuckiFacilityPlugin custom/plugins/MuckiLogPlugin \
+ && git clone --depth 1 --branch ${FACILITY_PLUGIN_REF} https://github.com/muckiware/MuckiFacilityPlugin.git custom/plugins/MuckiFacilityPlugin \
  && git clone --depth 1 --branch ${LOG_PLUGIN_REF} https://github.com/muckiware/MuckiLogPlugin.git custom/plugins/MuckiLogPlugin \
  && git clone --depth 1 --branch ${RESTIC_LIB_REF} https://github.com/muckiware/restic.git custom/muckiware/restic \
  && rm -rf custom/plugins/MuckiFacilityPlugin/.git custom/plugins/MuckiLogPlugin/.git custom/muckiware/restic/.git
@@ -69,7 +70,10 @@ RUN sed -i '/<service id="MuckiLogPlugin\\Storefront\\Controller\\ErrorControlle
  && echo "MuckiLogPlugin services.xml patched and valid"
 
 # Register both plugins with composer (path repos custom/plugins/*, same as DDEV)
-RUN composer require \
+# custom/apps and custom/static-plugins are referenced by composer.json path
+# repositories — create them so composer does not fail on missing dirs.
+RUN mkdir -p custom/apps custom/static-plugins \
+ && composer require \
         muckiware/facility-plugin:"*" \
         muckiware/log-plugin:"*" \
         --no-interaction --no-scripts \
