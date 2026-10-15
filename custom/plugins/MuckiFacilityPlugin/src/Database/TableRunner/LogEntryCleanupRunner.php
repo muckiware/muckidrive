@@ -1,0 +1,202 @@
+<?php declare(strict_types=1);
+/**
+ * MuckiFacilityPlugin
+ *
+ * @category   SW6 Plugin
+ * @package    MuckiFacility
+ * @copyright  Copyright (c) 2024-2026 by Muckiware
+ * @license    MIT
+ * @author     Muckiware
+ *
+ */
+namespace MuckiFacilityPlugin\Database\TableRunner;
+
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
+
+use MuckiFacilityPlugin\Core\Defaults as PluginDefaults;
+use MuckiFacilityPlugin\Exception\TableCleanupFailedException;
+use MuckiFacilityPlugin\Database\DatabaseHelper;
+use MuckiFacilityPlugin\Database\TableCleanupInterface;
+use MuckiFacilityPlugin\Services\SettingsInterface;
+use MuckiFacilityPlugin\Services\CliOutput;
+
+class LogEntryCleanupRunner extends CleanupRunner implements TableCleanupInterface
+{
+    const LOG_ENTRY_TEMP_TABLE_NAME = 'log_entry_temp';
+
+    protected string $logEntryTempTableName = self::LOG_ENTRY_TEMP_TABLE_NAME;
+
+    public function __construct(
+        LoggerInterface $logger,
+        Connection $connection,
+        SettingsInterface $pluginSettings,
+        CliOutput $cliOutput,
+        DatabaseHelper $databaseHelper
+    ) {
+        parent::__construct($logger, $connection, $pluginSettings, $cliOutput, $databaseHelper);
+    }
+
+    public function getLogEntryTempTableName(): string
+    {
+        return $this->logEntryTempTableName;
+    }
+
+    public function setCartTempTableName(string $logEntryTempTableName): void
+    {
+        $this->logEntryTempTableName = $logEntryTempTableName;
+    }
+
+    public function getCreateTableStatement(): string
+    {
+        $this->cliOutput->writeNewLineCliOutput('Get create log_entry SQL statement');
+
+        try {
+            $sql = 'SHOW CREATE TABLE log_entry';
+            $originLogEntryCreateStatement = $this->connection->executeQuery($sql)->fetchAllKeyValue()['log_entry'];
+        } catch (Exception $e) {
+
+            $this->logger->error(print_r($e, true), PluginDefaults::DEFAULT_LOGGER_CONFIG);
+            throw new TableCleanupFailedException('Not possible to insert log_entry items into origin table '.$e->getMessage());
+        }
+
+        return str_replace(
+            "\n",
+            '',
+            $originLogEntryCreateStatement
+        );
+    }
+
+    public function checkOldTempTable(): bool
+    {
+        $schemaManager = $this->connection->createSchemaManager();
+        $tableName = $this->getLogEntryTempTableName();
+
+        try {
+
+            if ($schemaManager->tablesExist([$tableName])) {
+
+                $this->cliOutput->writeNewLineCliOutput('Drop old '.$tableName.' table');
+                $schemaManager->dropTable($tableName);
+            }
+
+        } catch (Exception $e) {
+
+            $this->logger->error(print_r($e->getMessage(), true), PluginDefaults::DEFAULT_LOGGER_CONFIG);
+            throw new TableCleanupFailedException('Not possible to check old '.$tableName.' table');
+        }
+
+        $this->cliOutput->writeSameLineCliOutput('...done');
+
+        return true;
+    }
+
+    public function removeOldTableItems(): void
+    {
+        $this->cliOutput->writeNewLineCliOutput('Remove old log entry items');
+        $lastValidDate = $this->pluginSettings->getLastValidDateForLogEntry();
+
+        if($this->databaseHelper->columnExists('log_entry', 'updated_at')) {
+            $sql = '
+            DELETE FROM
+                `log_entry`
+            WHERE
+		            created_at <= ' . $this->connection->quote($lastValidDate) . '
+	            AND
+		            (updated_at IS NULL OR updated_at <= ' . $this->connection->quote($lastValidDate) . ')
+        ';
+        } else {
+            $sql = '
+            DELETE FROM
+                `log_entry`
+            WHERE
+		            created_at <= ' . $this->connection->quote($lastValidDate) . '
+        ';
+        }
+
+        try {
+            $this->connection->executeStatement($sql);
+        } catch (Exception $e) {
+
+            $this->logger->error($e->getMessage(), PluginDefaults::DEFAULT_LOGGER_CONFIG);
+            $this->cliOutput->writeNewLineCliOutput($e->getMessage());
+            throw new TableCleanupFailedException('Problem to remove old log entry items');
+        }
+
+        $this->cliOutput->writeSameLineCliOutput('...done');
+    }
+
+    public function createTempTable(string $sqlCreateStatement): bool
+    {
+        $this->cliOutput->writeNewLineCliOutput('Create temp log_entry table');
+
+        // Only rename the table name, not index/constraint names containing "log_entry".
+        $sqlCart = str_replace(
+            'CREATE TABLE `log_entry`',
+            'CREATE TABLE `'.$this::LOG_ENTRY_TEMP_TABLE_NAME.'`',
+            $sqlCreateStatement
+        );
+
+        $sql = str_replace(
+            'CREATE TABLE',
+            'CREATE TABLE IF NOT EXISTS',
+            $sqlCart
+        );
+
+        try {
+            $this->connection->executeStatement($sql);
+            $this->cliOutput->writeSameLineCliOutput('...done');
+
+        } catch (Exception $e) {
+
+            $this->logger->error($e->getMessage(), PluginDefaults::DEFAULT_LOGGER_CONFIG);
+            throw new TableCleanupFailedException('Problem to create temp log_entry table');
+        }
+
+        return true;
+    }
+
+    public function countTableItems(string $tableName): int
+    {
+        $this->cliOutput->writeNewLineCliOutput('Check log_entry items in temp table');
+
+        $sql = '
+            SELECT COUNT(*) FROM `'.$tableName.'`;
+        ';
+
+        try {
+            $counter = (int) $this->connection->fetchOne($sql);
+        } catch (Exception $e) {
+
+            $this->logger->error($e->getMessage(), PluginDefaults::DEFAULT_LOGGER_CONFIG);
+            throw new TableCleanupFailedException('copy of log_entry items into temp table not possible');
+        }
+
+        $this->cliOutput->writeSameLineCliOutput('...found ' . $counter . ' current log_entry items');
+
+        return $counter;
+    }
+
+    public function removeTableByName(string $tableName): void
+    {
+        $this->cliOutput->writeNewLineCliOutput('Remove '.$tableName.' table');
+
+        try {
+
+            $this->connection->executeStatement('DROP TABLE `'.$tableName.'`;');
+            $this->cliOutput->writeSameLineCliOutput('...done');
+
+        } catch (Exception $e) {
+
+            $this->logger->error($e->getMessage(), PluginDefaults::DEFAULT_LOGGER_CONFIG);
+            throw new TableCleanupFailedException('Not possible to remove '.$tableName.' table');
+        }
+    }
+
+    public function getTempTableName(): string
+    {
+        return 'log_entry_temp';
+    }
+}

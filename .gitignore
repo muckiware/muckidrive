@@ -25,3 +25,21 @@ phpstan.neon
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+
+###> muckisafe release ###
+.DS_Store
+**/.DS_Store
+**/.phpunit.result.cache
+**/node_modules/
+/vendor/
+/.env
+/.env.dev
+/.env.test
+/parameters.txt
+/.uniqueid.txt
+/.idea/
+/.playwright-mcp/
+/.ddev/
+/custom/muckiware/core.zip
+/custom/plugins/MuckiLogPlugin/logfile.txt
+###< muckisafe release ###

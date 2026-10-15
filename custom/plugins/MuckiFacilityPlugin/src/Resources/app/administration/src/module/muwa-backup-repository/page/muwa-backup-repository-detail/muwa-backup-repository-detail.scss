@@ -1,0 +1,57 @@
+div.muwa-backup-repository-detail-forget__description,
+div.muwa-backup-repository-detail-backup-paths__description {
+  margin: 15px 0;
+}
+
+.muwa-backup-repository-content-tabs div.sw-tabs__custom-content {
+  padding: 0;
+}
+
+.muwa-backup-repository-stats-history__chart + .muwa-backup-repository-stats-history__chart {
+  margin-top: 30px;
+}
+
+.muwa-backup-repository-history-filter .sw-sidebar-item__scrollable-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  // the sidebar item stretches its content to 100% width, so a left/right
+  // margin here would push it past the panel's edge instead of inset it.
+  box-sizing: border-box;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+div.muwa-backup-repository-detail-repository-password__description,
+div.muwa-backup-repository-detail-repository-path__description {
+  margin-bottom: 60px;
+  margin-top: -18px;
+  padding: 10px 8px;
+  background-color: #ffe0c0;
+  border: #ff992f 1px solid;
+  border-radius: 4px;
+}
+
+/* Die Tabs liegen im Fluss oberhalb der absolut positionierten, 100 % hohen
+   .sw-card-view. Deren Hoehen summieren sich dadurch auf 100 % + Tabs-Hoehe,
+   sodass zusaetzlich zu .sw-card-view__content auch
+   .sw-page__main-content-inner scrollt (zweiter Scrollbalken).
+   Loesung: Spalten-Flexbox, Card-View in den Fluss holen. */
+.muwa-backup-repository-tabs-detail {
+    > .sw-page__content > .sw-page__main-content > .sw-page__main-content-inner {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        > .muwa-backup-repository-content-tabs {
+            flex: 0 0 auto;
+        }
+
+        > .sw-card-view {
+            position: relative;
+            flex: 1 1 auto;
+            min-height: 0;
+            height: auto;
+        }
+    }
+}

@@ -1,0 +1,718 @@
+{% block muwa_search_structure_detail %}
+    <sw-page class="muwa-backup-repository-tabs-detail">
+        {% block muwa_search_structure_detail_smart_bar_actions %}
+            <template #smart-bar-actions>
+                <sw-button :routerLink="{ name: 'muwa.backup.repository.index'}">
+                    {{ $tc('muwa-backup-repository.list.header.cancelButtonLabel') }}
+                </sw-button>
+
+                <sw-button-process
+                    position-identifier="muwa-backup-repository"
+                    :isLoading="isLoading"
+                    v-if="backupRepository && tab === 'backupRepositoryConfig'"
+                    :processSuccess="processSuccess"
+                    :disabled="!acl.can('muwa_backup_repository.editor')"
+                    variant="primary"
+                    @process-finish="saveFinish"
+                    @click="onClickSave"
+                >
+                    {{ $tc('muwa-backup-repository.list.header.saveButtonLabel') }}
+                </sw-button-process>
+                <sw-button-process
+                        variant="ghost"
+                        class="sw-settings-search__search-index-rebuild-button"
+                        :isLoading="isBackupProcessInProgress"
+                        :disabled="isBackupProcessDisabled || !acl.can('muwa_backup_repository.editor')"
+                        :process-success="isBackupProcessSuccess"
+                        @update:process-success="createFinish"
+                        @click="onBackupProcess"
+                >
+                    {{ $tc('muwa-backup-repository.detail.startBackup') }}
+                </sw-button-process>
+            </template>
+        {% endblock %}
+
+        <template #content>
+            {% block muwa_backup_repository_detail_content %}
+
+                {% block muwa_search_structure_content_tabs %}
+                    <sw-tabs default-item="repositoryList" class="muwa-backup-repository-content-tabs" position-identifier="muwa-backup-repository-content-tabs">
+                        <template #default="{ active }">
+                            <sw-tabs-item
+                                key="backupRepositoryConfig"
+                                :active-tab="active"
+                                :route="{ name: 'muwa.backup.repository.detail', params: { id: backupRepository.id, tab: 'backupRepositoryConfig' } }"
+                            >
+                                {{ $tc('muwa-backup-repository.tabs.config') }}
+                            </sw-tabs-item>
+                            <sw-tabs-item
+                                key="backupRepositoryStats"
+                                :active-tab="active"
+                                :route="{ name: 'muwa.backup.repository.detail', params: { id: backupRepository.id, tab: 'backupRepositoryStats' } }"
+                            >
+                                {{ $tc('muwa-backup-repository.tabs.stats') }}
+                            </sw-tabs-item>
+                            <sw-tabs-item
+                                key="backupRepositoryChecks"
+                                :active-tab="active"
+                                :route="{ name: 'muwa.backup.repository.detail', params: { id: backupRepository.id, tab: 'backupRepositoryChecks' } }"
+                            >
+                                {{ $tc('muwa-backup-repository.tabs.checks') }}
+                            </sw-tabs-item>
+                            <sw-tabs-item
+                                    key="backupRepositorySnapshots"
+                                    :active-tab="active"
+                                    :route="{ name: 'muwa.backup.repository.detail', params: { id: backupRepository.id, tab: 'backupRepositorySnapshots' } }"
+                            >
+                                {{ $tc('muwa-backup-repository.tabs.snapshots') }}
+                            </sw-tabs-item>
+                        </template>
+                    </sw-tabs>
+                {% endblock %}
+
+                <sw-card-view>
+                    <sw-card positionIdentifier="muwaBackupRepository" v-if="backupRepository && tab === 'backupRepositoryConfig'" :title="$tc('muwa-backup-repository.detail.generalLabel')">
+                        <sw-switch-field
+                            v-if="isV6600"
+                            :label="$tc('muwa-backup-repository.detail.activeLabel')"
+                            v-model:value="backupRepository.active"
+                        >
+                        </sw-switch-field>
+                        <sw-switch-field
+                            v-if="isV6500"
+                            :label="$tc('muwa-backup-repository.detail.activeLabel')"
+                            v-model="backupRepository.active"
+                        >
+                        </sw-switch-field>
+
+                        <sw-text-field
+                            v-if="isV6600"
+                            :label="$tc('muwa-backup-repository.detail.nameLabel')"
+                            v-model:value="backupRepository.name"
+                            maxlength="70"
+                            validation="required"
+                            required
+                        >
+                        </sw-text-field>
+                        <sw-text-field
+                            v-if="isV6500"
+                            :label="$tc('muwa-backup-repository.detail.nameLabel')"
+                            v-model="backupRepository.name"
+                            maxlength="70"
+                            validation="required"
+                            required
+                        >
+                        </sw-text-field>
+
+                        {# From 6.7 on sw-select-field renders mt-select, which binds via
+                           modelValue and ignores forwarded option slots. #}
+                        <sw-select-field
+                            v-if="backupRepository && isV6700"
+                            v-model="backupRepository.type"
+                            validation="required"
+                            required
+                            :disabled="false"
+                            :options="typeOptions"
+                            :label="$tc('muwa-backup-repository.detail.card-base.type')"
+                        >
+                        </sw-select-field>
+                        <sw-select-field
+                            v-if="backupRepository && isV6600 && !isV6700"
+                            v-model:value="backupRepository.type"
+                            validation="required"
+                            required
+                            :disabled="false"
+                            type="select"
+                            :options="typeOptions"
+                            :label="$tc('muwa-backup-repository.detail.card-base.type')"
+                        >
+                        </sw-select-field>
+                        <sw-select-field
+                            v-if="backupRepository && isV6500"
+                            v-model="backupRepository.type"
+                            validation="required"
+                            required
+                            :disabled="true"
+                            type="select"
+                            :label="$tc('muwa-backup-repository.detail.databaseTypeLabel')"
+                        >
+                            <option slot="options"
+                                v-for="option in type"
+                                :key="option.value"
+                                :value="option.value"
+                            >
+                                {{ option.label }}
+                            </option>
+                        </sw-select-field>
+
+                        <sw-text-field
+                            v-if="isV6600"
+                            :label="$tc('muwa-backup-repository.detail.repositoryPathLabel')"
+                            v-model:value="backupRepository.repositoryPath"
+                            maxlength="255"
+                            validation="required"
+                            required
+                            :disabled="true"
+                        >
+                        </sw-text-field>
+                        <sw-text-field
+                            v-if="isV6500"
+                            :label="$tc('muwa-backup-repository.detail.repositoryPathLabel')"
+                            v-model="backupRepository.repositoryPath"
+                            maxlength="255"
+                            validation="required"
+                            required
+                            :disabled="true"
+                        >
+                        </sw-text-field>
+
+                        <sw-text-field
+                            v-if="isV6600"
+                            :label="$tc('muwa-backup-repository.detail.restorePathLabel')"
+                            v-model:value="backupRepository.restorePath"
+                            maxlength="255"
+                            validation="required"
+                            required
+                        >
+                        </sw-text-field>
+                        <sw-text-field
+                            v-if="isV6500"
+                            :label="$tc('muwa-backup-repository.detail.restorePathLabel')"
+                            v-model="backupRepository.restorePath"
+                            maxlength="255"
+                            validation="required"
+                            required
+                        >
+                        </sw-text-field>
+
+                        <sw-text-field
+                            v-if="isV6600"
+                            :label="$tc('muwa-backup-repository.detail.dbDumpPathLabel')"
+                            :placeholder="$tc('muwa-backup-repository.detail.dbDumpPathPlaceholder')"
+                            :helpText="$tc('muwa-backup-repository.detail.dbDumpPathHelpText')"
+                            v-model:value="backupRepository.dbDumpPath"
+                            maxlength="255"
+                        >
+                        </sw-text-field>
+                        <sw-text-field
+                            v-if="isV6500"
+                            :label="$tc('muwa-backup-repository.detail.dbDumpPathLabel')"
+                            :placeholder="$tc('muwa-backup-repository.detail.dbDumpPathPlaceholder')"
+                            :helpText="$tc('muwa-backup-repository.detail.dbDumpPathHelpText')"
+                            v-model="backupRepository.dbDumpPath"
+                            maxlength="255"
+                        >
+                        </sw-text-field>
+                        <sw-text-field
+                                v-if="isV6600"
+                                :label="$tc('muwa-backup-repository.detail.hostnameLabel')"
+                                v-model:value="backupRepository.hostname"
+                                maxlength="128"
+                                validation="required"
+                                required
+                        >
+                        </sw-text-field>
+                        <sw-text-field
+                                v-if="isV6500"
+                                :label="$tc('muwa-backup-repository.detail.hostnameLabel')"
+                                v-model="backupRepository.hostname"
+                                maxlength="128"
+                                validation="required"
+                                required
+                        >
+                        </sw-text-field>
+
+                    </sw-card>
+                    <sw-card positionIdentifier="muwaBackupRepositoryBackupPaths" v-if="backupRepository && tab === 'backupRepositoryConfig'" :title="$tc('muwa-backup-repository.detail.backupPaths')">
+                        <sw-button
+                            v-tooltip="{
+                                message: $tc('sw-import-export.profile.addMappingTooltipText'),
+                                showOnDisabledElements: true
+                            }"
+                            class="sw-import-export-edit-profile-modal-mapping__add-action"
+                            variant="ghost"
+                            size="small"
+                            @click="onAddBackupPath"
+                        >
+                            {{ $tc('muwa-backup-repository.detail.addBackupPathLabel') }}
+                        </sw-button>
+                        {% block muwa_search_structure_detail_backup_paths_description %}
+                            <div
+                                v-html="$tc('muwa-backup-repository.detail.backupPathsDescription')"
+                                class="muwa-backup-repository-detail-backup-paths__description"
+                            ></div>
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block wuwa_search_structure_mapping_grid %}
+                            <sw-data-grid
+                                v-if="backupPathExist"
+                                :data-source="getBackupPaths"
+                                :compact-mode="false"
+                                :show-selection="false"
+                                :columns="backupPathsColumns"
+                                plain-appearance
+                                class="sw-import-export-edit-profile-modal-mapping__grid"
+                            >
+                                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                                {% block wuwa_backup_repository_backup_paths_grid_data_type_column %}
+                                    <template #column-backupPath="{ item, itemIndex }">
+                                        <sw-text-field
+                                            v-if="isV6600"
+                                            v-model:value="item.backupPath"
+                                            :name="`backupPath-${itemIndex}`"
+                                            :disabled="false"
+                                        />
+                                        <sw-text-field
+                                            v-if="isV6500"
+                                            v-model="item.backupPath"
+                                            :name="`backupPath-${itemIndex}`"
+                                            :disabled="false"
+                                        />
+                                    </template>
+                                {% endblock %}
+                                {% block wuwa_backup_repository_compress_grid_data_type_column %}
+                                    <template #column-compress="{ item, itemIndex }">
+                                        <sw-switch-field
+                                            v-if="isV6600"
+                                            :label="$tc('muwa-backup-repository.detail.compressLabel')"
+                                            :name="`compress-${itemIndex}`"
+                                            v-model:value="item.compress"
+                                        >
+                                        </sw-switch-field>
+                                        <sw-switch-field
+                                            v-if="isV6500"
+                                            :label="$tc('muwa-backup-repository.detail.compressLabel')"
+                                            :name="`compress-${itemIndex}`"
+                                            v-model="item.compress"
+                                        >
+                                        </sw-switch-field>
+                                    </template>
+                                {% endblock %}
+
+                                <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                                {% block wuwa_search_structure_mapping_grid_context_menu_delete %}
+                                    <template #actions="{ item }">
+                                        <sw-context-menu-item
+                                            variant="danger"
+                                            :disabled="false"
+                                            @click="onDeleteBackupPath(item.id)"
+                                        >
+                                            {{ $tc('muwa-backup-repository.backupPaths.deletePathLabel') }}
+                                        </sw-context-menu-item>
+                                    </template>
+                                {% endblock %}
+
+                            </sw-data-grid>
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block wuwa_search_structure_mapping_empty_state %}
+                            <sw-empty-state
+                                v-else
+                                class="sw-import-export-edit-profile-modal-mapping__empty-state"
+                                :title="$tc('muwa-backup-repository.detail.pathEmptyState')"
+                                :absolute="false"
+                                icon="regular-file"
+                            />
+                        {% endblock %}
+                    </sw-card>
+
+                    <sw-card positionIdentifier="muwaBackupRepositoryForget" v-if="backupRepository && tab === 'backupRepositoryConfig'" :title="$tc('muwa-backup-repository.detail.forget')">
+                        {% block muwa_search_structure_detail_forget_description %}
+                            <div
+                                v-html="$tc('muwa-backup-repository.detail.forgetDescription')"
+                                class="muwa-backup-repository-detail-forget__description"
+                            ></div>
+                        {% endblock %}
+
+                        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                        {% block wuwa_backup_repository_forget_list %}
+                            {% block wuwa_backup_repository_backup_paths_list_forget_daily_column %}
+                                <sw-number-field
+                                    v-if="isV6600"
+                                    v-model:value="backupRepository.forgetDaily"
+                                    :name="dailyForget"
+                                    :label="$tc('muwa-backup-repository.detail.forgetDailyLabel')"
+                                    :disabled="false"
+                                />
+                                <sw-number-field
+                                    v-if="isV6500"
+                                    v-model="backupRepository.forgetDaily"
+                                    :name="dailyForget"
+                                    :label="$tc('muwa-backup-repository.detail.forgetDailyLabel')"
+                                    :disabled="false"
+                                />
+                            {% endblock %}
+                            {% block wuwa_backup_repository_backup_paths_list_forget_weekly_column %}
+                                <sw-number-field
+                                    v-if="isV6600"
+                                    v-model:value="backupRepository.forgetWeekly"
+                                    :name="dailyForget"
+                                    :label="$tc('muwa-backup-repository.detail.forgetWeeklyLabel')"
+                                    :disabled="false"
+                                />
+                                <sw-number-field
+                                    v-if="isV6500"
+                                    v-model="backupRepository.forgetWeekly"
+                                    :name="dailyForget"
+                                    :label="$tc('muwa-backup-repository.detail.forgetWeeklyLabel')"
+                                    :disabled="false"
+                                />
+                            {% endblock %}
+                            {% block wuwa_backup_repository_backup_paths_list_forget_monthly_column %}
+                                <sw-number-field
+                                    v-if="isV6600"
+                                    v-model:value="backupRepository.forgetMonthly"
+                                    :name="dailyForget"
+                                    :label="$tc('muwa-backup-repository.detail.forgetMonthlyLabel')"
+                                    :disabled="false"
+                                />
+                                <sw-number-field
+                                    v-if="isV6500"
+                                    v-model="backupRepository.forgetMonthly"
+                                    :name="dailyForget"
+                                    :label="$tc('muwa-backup-repository.detail.forgetMonthlyLabel')"
+                                    :disabled="false"
+                                />
+                            {% endblock %}
+                            {% block wuwa_backup_repository_backup_paths_list_forget_yearly_column %}
+                                <sw-number-field
+                                    v-if="isV6600"
+                                    v-model:value="backupRepository.forgetYearly"
+                                    :name="dailyForget"
+                                    :label="$tc('muwa-backup-repository.detail.forgetYearlyLabel')"
+                                    :disabled="false"
+                                />
+                                <sw-number-field
+                                    v-if="isV6500"
+                                    v-model="backupRepository.forgetYearly"
+                                    :name="dailyForget"
+                                    :label="$tc('muwa-backup-repository.detail.forgetYearlyLabel')"
+                                    :disabled="false"
+                                />
+                            {% endblock %}
+                        {% endblock %}
+
+                    </sw-card>
+
+                    {# Tab Checks #}
+                    <sw-entity-listing
+                        v-if="backupRepository && tab === 'backupRepositoryChecks'"
+                        :isLoading="isLoading"
+                        :items="backupRepositoryChecks"
+                        :repository="backupRepositoryChecksRepository"
+                        :columns="backupChecksColumns"
+                        :showActions="false"
+                        :showSelection="false"
+                        :showSettings="false"
+                        :sort-by="sortBy"
+                        :sort-direction="sortDirection"
+                        :full-page="false"
+                    >
+                        <template #column-checkStatus="{item}">
+                            <div v-if="item.checkStatus" :title="item.checkStatus">
+                                {{ item.checkStatus }}
+                            </div>
+                        </template>
+                        <template #column-createdAt="{ item }">
+                            {{ dateFilter(item.createdAt, { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }}
+                        </template>
+                    </sw-entity-listing>
+
+                    {# Tab Repository Status #}
+                    <sw-card
+                        positionIdentifier="muwaBackupRepositoryStatsPanel"
+                        v-if="backupRepository && tab === 'backupRepositoryStats'"
+                        :title="$tc('muwa-backup-repository.list.stats')"
+                        :isLoading="isStatsLoading"
+                        :large="true"
+                    >
+                        <template v-if="latestStats">
+                            <sw-data-grid
+                                :showSelection="false"
+                                :showActions="false"
+                                :showSettings="false"
+                                :dataSource="currentStatsItems"
+                                :columns="currentStatsColumns"
+                                :plain-appearance="true"
+                            />
+                        </template>
+                        <sw-empty-state
+                            v-else-if="!isStatsLoading"
+                            :absolute="false"
+                            :title="$tc('muwa-backup-repository.detail.statsEmptyTitle')"
+                            :subline="$tc('muwa-backup-repository.detail.statsEmptySubline')"
+                        />
+                    </sw-card>
+                    <sw-card
+                        positionIdentifier="muwaBackupRepositoryStatsHistory"
+                        v-if="backupRepository && tab === 'backupRepositoryStats'"
+                        :title="$tc('muwa-backup-repository.detail.statsHistoryLabel')"
+                        :large="true"
+                    >
+                        {% block muwa_backup_repository_stats_history_view_tabs %}
+                            <sw-tabs
+                                v-if="backupRepositoryStats.length"
+                                small
+                                default-item="table"
+                                position-identifier="muwa-backup-repository-stats-history"
+                                class="muwa-backup-repository-stats-history__tabs"
+                                @new-item-active="onStatsHistoryTabChange"
+                            >
+                                <template #default="{ active }">
+                                    <sw-tabs-item name="table" :active-tab="active">
+                                        {{ $tc('muwa-backup-repository.detail.statsHistoryTabTable') }}
+                                    </sw-tabs-item>
+                                    <sw-tabs-item name="diagram" :active-tab="active">
+                                        {{ $tc('muwa-backup-repository.detail.statsHistoryTabDiagram') }}
+                                    </sw-tabs-item>
+                                </template>
+                            </sw-tabs>
+                        {% endblock %}
+
+                        {% block muwa_backup_repository_stats_history_table %}
+                            <template v-if="backupRepositoryStats.length && statsHistoryView === 'table'" #grid>
+                                <sw-data-grid
+                                    :showSelection="false"
+                                    :showActions="false"
+                                    :showSettings="false"
+                                    :dataSource="backupRepositoryStats"
+                                    :columns="statsHistoryColumns"
+                                    :plain-appearance="true"
+                                    :is-loading="isStatsLoading"
+                                >
+                                    <template #column-createdAt="{ item }">
+                                        {{ dateFilter(item.createdAt, { hour: '2-digit', minute: '2-digit' }) }}
+                                    </template>
+                                    <template #column-fileSystemSize="{ item }">
+                                        {{ formatBytes(item.fileSystemSize) }}
+                                    </template>
+                                    <template #column-totalSize="{ item }">
+                                        {{ formatBytes(item.totalSize) }}
+                                    </template>
+                                    <template #column-snapshotsCount="{ item }">
+                                        {{ formatCount(item.snapshotsCount) }}
+                                    </template>
+                                    <template #column-totalFileCount="{ item }">
+                                        {{ formatCount(item.totalFileCount) }}
+                                    </template>
+                                </sw-data-grid>
+                            </template>
+                        {% endblock %}
+
+                        {% block muwa_backup_repository_stats_history_diagram %}
+                            <template v-if="backupRepositoryStats.length && statsHistoryView === 'diagram'">
+                                <sw-chart
+                                    type="line"
+                                    class="muwa-backup-repository-stats-history__chart"
+                                    :series="statsHistorySizeSeries"
+                                    :options="statsHistorySizeChartOptions"
+                                />
+                                <sw-chart
+                                    type="line"
+                                    class="muwa-backup-repository-stats-history__chart"
+                                    :series="statsHistoryCountSeries"
+                                    :options="statsHistoryCountChartOptions"
+                                />
+                            </template>
+                        {% endblock %}
+
+                        {% block muwa_backup_repository_stats_history_empty_state %}
+                            <sw-empty-state
+                                v-if="!backupRepositoryStats.length && !isStatsLoading"
+                                :absolute="false"
+                                :title="$tc('muwa-backup-repository.detail.statsHistoryEmptyTitle')"
+                            />
+                        {% endblock %}
+                    </sw-card>
+
+                    {# Tab Snapshots #}
+                    <sw-entity-listing
+                        v-if="backupRepository && tab === 'backupRepositorySnapshots'"
+                        :isLoading="isLoading"
+                        :items="backupRepositorySnapshots"
+                        :repository="backupRepositorySnapshotsRepository"
+                        :columns="backupSnapshotsColumns"
+                        :showActions="true"
+                        :showSettings="false"
+                        :show-selection="true"
+                        :allow-delete="acl.can('muwa_backup_repository.delete_snapshots')"
+                        :sort-by="sortBy"
+                        :sort-direction="sortDirection"
+                        @selection-change="updateSelection"
+                        @items-delete-finish="itemsDeleteFinish"
+                        @column-sort="onSortColumn"
+                        :large="true"
+                        :full-page="false"
+                    >
+                        <template #column-snapshot-id="{item}">
+                            <div v-if="item.snapshotShortId" :title="item.snapshotShortId">
+                                {{ item.snapshotShortId }}
+                            </div>
+                        </template>
+                        <template #column-snapshot-paths="{item}">
+                            <div v-if="item.paths" :title="item.paths">
+                                {{ item.paths }}
+                            </div>
+                        </template>
+                        <template #column-snapshot-hostname="{item}">
+                            <div v-if="item.hostname" :title="item.hostname">
+                                {{ item.hostname }}
+                            </div>
+                        </template>
+                        <template #column-snapshot-size="{item}">
+                            <div v-if="item.size" :title="item.size">
+                                {{ item.size }}
+                            </div>
+                        </template>
+                        <template #column-createdAt="{ item }">
+                            {{ dateFilter(item.createdAt, { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }}
+                        </template>
+                        <template #actions="{ item }">
+                            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                            {% block wuwa_backup_repository_list_content_listing_actions %}
+                                <sw-context-menu-item
+                                    size="small"
+                                    :disabled="!acl.can('muwa_backup_repository.restore')"
+                                    @click="restoreSnapshot(item)"
+                                >
+                                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                                    {% block wuwa_backup_repository_list_content_listing_action_show_label %}
+                                        {{ $tc('muwa-backup-repository.list.restoreLabel') }}
+                                    {% endblock %}
+                                </sw-context-menu-item>
+                            {% endblock %}
+
+                            {% block wuwa_backup_repository_list_content_listing_delete %}
+                                <sw-context-menu-item
+                                    class="sw-customer-list__delete-action"
+                                    variant="danger"
+                                    :disabled="!acl.can('muwa_backup_repository.delete_snapshots')"
+                                    size="small"
+                                    @click="onDelete(item.id)"
+                                >
+                                    {{ $tc('muwa-backup-repository.list.buttonDelete') }}
+                                </sw-context-menu-item>
+                            {% endblock %}
+                        </template>
+
+                        {% block wuwa_backup_repository_list_grid_action_modals %}
+                        <template #action-modals="{ item }">
+
+                            {% block wuwa_backup_repository_list_delete_modal %}
+                            <sw-modal
+                                    v-if="showDeleteModal === item.id"
+                                    :title="$tc('global.default.warning')"
+                                    variant="small"
+                                    @modal-close="onCloseDeleteModal"
+                            >
+
+                                {% block wuwa_backup_repository_list_delete_modal_confirm_delete_text %}
+                                <p class="muwa-backup-repository-list__confirm-delete-text">
+                                {{ $t('muwa-backup-repository.list.textDeleteSnapshotConfirm', { snapshotShortId: `${item.snapshotShortId}` }) }}
+                            </p>
+                            {% endblock %}
+
+                            {% block wuwa_backup_repository_list_delete_modal_footer %}
+                                <template #modal-footer>
+
+                                    {% block wuwa_backup_repository_list_delete_modal_cancel %}
+                                    <sw-button
+                                            size="small"
+                                            @click="onCloseDeleteModal"
+                                    >
+                                        {{ $tc('global.default.cancel') }}
+                                        </sw-button>
+                                        {% endblock %}
+
+                                        {% block sw_customer_list_delete_modal_confirm %}
+                                        <sw-button
+                                        variant="danger"
+                                        size="small"
+                                        @click="onConfirmDelete(item.id, item.snapshotId)"
+                                        >
+                                        {{ $tc('muwa-backup-repository.buttonDelete') }}
+                                    </sw-button>
+                                    {% endblock %}
+                                </template>
+                                {% endblock %}
+                            </sw-modal>
+                            {% endblock %}
+                        </template>
+                        {% endblock %}
+
+                    </sw-entity-listing>
+                </sw-card-view>
+            {% endblock %}
+        </template>
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block muwa_backup_repository_list_sidebar %}
+            <template #sidebar>
+                <sw-sidebar class="muwa-backup-repository-list__sidebar" v-if="tab === 'backupRepositoryChecks' || tab === 'backupRepositorySnapshots' || tab === 'backupRepositoryStats'">
+                    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+                    {% block muwa_backup_repository_list_sidebar_refresh %}
+                        <sw-sidebar-item
+                                icon="regular-undo"
+                                :title="$tc('muwa-backup-repository.list.titleSidebarItemRefresh')"
+                                @click="onRefresh"
+                        />
+                    {% endblock %}
+
+                    {% block muwa_backup_repository_list_sidebar_history_filter %}
+                        <sw-sidebar-item
+                            icon="regular-filter"
+                            :has-simple-badge="historyFilterActive"
+                            :title="$tc('muwa-backup-repository.detail.historyFilterSidebarTitle')"
+                            class="muwa-backup-repository-history-filter"
+                        >
+                            {# From 6.7 on sw-select-field renders mt-select, which binds via
+                               modelValue and ignores forwarded option slots — see the type
+                               select above for the same 6.6/6.7 split. #}
+                            <sw-select-field
+                                v-if="isV6700"
+                                :model-value="historyActivePreset"
+                                :options="historyFilterPresetOptions"
+                                :label="$tc('muwa-backup-repository.detail.historyFilterPresetLabel')"
+                                :placeholder="$tc('muwa-backup-repository.detail.historyFilterPresetPlaceholder')"
+                                @update:model-value="onHistoryPresetSelect"
+                            />
+                            <sw-select-field
+                                v-if="isV6600 && !isV6700"
+                                type="select"
+                                :value="historyActivePreset"
+                                :options="historyFilterPresetOptions"
+                                :label="$tc('muwa-backup-repository.detail.historyFilterPresetLabel')"
+                                :placeholder="$tc('muwa-backup-repository.detail.historyFilterPresetPlaceholder')"
+                                @update:value="onHistoryPresetSelect"
+                            />
+
+                            <sw-datepicker
+                                dateType="date"
+                                :label="$tc('muwa-backup-repository.detail.historyFilterFromLabel')"
+                                :value="historyFilterFrom"
+                                @update:value="onHistoryFilterFromChange"
+                            />
+                            <sw-datepicker
+                                dateType="date"
+                                :label="$tc('muwa-backup-repository.detail.historyFilterToLabel')"
+                                :value="historyFilterTo"
+                                @update:value="onHistoryFilterToChange"
+                            />
+
+                            <sw-button
+                                v-if="historyFilterActive"
+                                size="small"
+                                variant="ghost"
+                                block
+                                @click="onHistoryFilterReset"
+                            >
+                                {{ $tc('muwa-backup-repository.detail.historyFilterResetLabel') }}
+                            </sw-button>
+                        </sw-sidebar-item>
+                    {% endblock %}
+                </sw-sidebar>
+            </template>
+        {% endblock %}
+    </sw-page>
+{% endblock %}

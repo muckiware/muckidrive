@@ -1,0 +1,11 @@
+*.DS_Store
+/composer.lock
+/vendor/
+/.ddev/
+/.phpunit.result.cache
+/var/cache/
+/var/testRep/
+/var/testBackup/
+/var/testRestore/
+/.idea/
+.env.test

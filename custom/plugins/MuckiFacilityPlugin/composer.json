@@ -1,0 +1,60 @@
+{
+	"name" : "muckiware/facility-plugin",
+	"description" : "Muckiware Facility Plugin for Shopware 6",
+	"version": "v0.7.0",
+	"keywords": [
+		"shopware6",
+		"backup",
+		"restic",
+		"repository",
+		"restore",
+		"snapshot",
+		"storage",
+		"plugin"
+	],
+	"type" : "shopware-platform-plugin",
+	"license" : "MIT",
+	"authors": [
+		{
+			"name": "muckiware"
+		}
+	],
+	"extra" : {
+		"shopware-plugin-class" : "MuckiFacilityPlugin\\MuckiFacilityPlugin",
+		"copyright" : "(c) by muckiware",
+		"label" : {
+			"de-DE" : "Mucki Facility Erweiterung",
+			"en-GB" : "Mucki Facility Plugin"
+		}
+	},
+	"require" : {
+		"php" : "~8.2.0 || ~8.3.0 || ~8.4.0",
+		"ext-sodium": "*",
+		"shopware/core": "~6.6.0 || ~6.7.0",
+		"spatie/db-dumper": "^3.7",
+		"muckiware/restic": "^1.4",
+		"gabrielelana/byte-units": "^0.5.0"
+	},
+	"require-dev" : {
+		"phpstan/phpstan" : "*"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"MuckiFacilityPlugin\\" : "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"MuckiFacilityPlugin\\": "tests/"
+		}
+	},
+	"config": {
+		"allow-plugins": {
+			"symfony/runtime": true,
+			"php-http/discovery": false
+		}
+	},
+	"scripts": {
+		"phpstan": "./vendor/bin/phpstan analyse -n --no-progress"
+	}
+}
