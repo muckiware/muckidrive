@@ -8,7 +8,7 @@
 shopware/core ~v6.7.0   ← Base framework (DAL, DI, Events, Migrations)
 muckiware/core          ← Selective loader: only required SW Core bundles
 muckiware/master        ← Customized administration (without shop UI)
-MuckiLogPlugin          ← Example plugin (Log4php-based logging)
+custom/plugins/*        ← Your plugins (added by each deployment, not part of the platform)
 ```
 
 ## Architecture
@@ -117,7 +117,7 @@ npm run eslint     # Linting
 
 Plugins live in `custom/plugins/` and are standard Shopware plugins (extend `Plugin`).
 
-**Example plugin:** `MuckiLogPlugin`
+**Example plugin:** [`MuckiLogPlugin`](https://github.com/muckiware/MuckiLogPlugin) (separate repository)
 - Log4php-based logging system
 - Custom entity, migration, scheduled task
 - Event subscriber for exceptions

@@ -1,12 +1,14 @@
 # syntax=docker/dockerfile:1
 #
 # MuckiSafe image — muckidrive (Shopware 6.7 core framework, no shop context)
-# with MuckiFacilityPlugin and MuckiLogPlugin pre-installed.
+# with the Muckiware facility and logging plugins added at build time.
 #
-# Build context = muckidrive repository root (needs: composer.json/composer.lock,
-# bin/, config/, files/, public/, src/, .htaccess, custom/muckiware/).
-# The plugins (MuckiFacilityPlugin v0.7.0, MuckiLogPlugin v2.4.0) and the restic
-# PHP library (v1.5.0) are committed in the repository under custom/.
+# muckidrive is a general platform: plugins do NOT live in its repository.
+# The MuckiSafe image adds them when it is built:
+#   - MuckiFacilityPlugin (github.com/muckiware/MuckiFacilityPlugin, tag below)
+#   - MuckiLogPlugin     (github.com/muckiware/MuckiLogPlugin, tag below)
+# The restic PHP client library (muckiware/restic) is vendored in the platform
+# repository under custom/muckiware/restic (path repo, see composer.json).
 
 # ---------------------------------------------------------------------------
 # Stage 1: dependencies + administration build (discarded afterwards)
@@ -40,18 +42,33 @@ COPY public ./public
 COPY src ./src
 COPY .htaccess ./
 COPY custom/muckiware ./custom/muckiware
-# Plugins are committed in the repository: MuckiFacilityPlugin v0.7.0 and
-# MuckiLogPlugin v2.4.0 with the storefront decorator service removed
-# (see comment below) — no GitHub clones at build time.
-COPY custom/plugins ./custom/plugins
+
+# --- MuckiSafe additions: plugins cloned from their public GitHub tags -----
+# muckidrive is a general platform — plugins do NOT live in its repository.
+# The image adds MuckiFacilityPlugin and MuckiLogPlugin at build time.
+ARG FACILITY_PLUGIN_REF=v0.7.0
+ARG LOG_PLUGIN_REF=v2.4.0
+RUN git clone --depth 1 --branch ${FACILITY_PLUGIN_REF} https://github.com/muckiware/MuckiFacilityPlugin.git custom/plugins/MuckiFacilityPlugin \
+ && git clone --depth 1 --branch ${LOG_PLUGIN_REF} https://github.com/muckiware/MuckiLogPlugin.git custom/plugins/MuckiLogPlugin \
+ && rm -rf custom/plugins/MuckiFacilityPlugin/.git custom/plugins/MuckiLogPlugin/.git
 
 # muckidrive does not load the Shopware storefront bundle. The MuckiLogPlugin
 # storefront ErrorControllerDecorator (shipped in v2.4.0) decorates a service
 # that does not exist here and would break container compilation — the service
-# block is removed (tested against SW 6.7.15.1). The patched services.xml is
-# committed in the repository (custom/plugins/MuckiLogPlugin).
+# block is removed during the build (verified against SW 6.7.15.1).
+RUN sed -i '/<service id="MuckiLogPlugin\\Storefront\\Controller\\ErrorControllerDecorator"/,/<\/service>/d' \
+        custom/plugins/MuckiLogPlugin/src/Resources/config/services.xml \
+ && ! grep -q ErrorControllerDecorator custom/plugins/MuckiLogPlugin/src/Resources/config/services.xml \
+ && php -r 'exit(simplexml_load_file("custom/plugins/MuckiLogPlugin/src/Resources/config/services.xml") === false ? 1 : 0);' \
+ && echo "MuckiLogPlugin services.xml patched and valid"
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Register both plugins with composer (path repos custom/plugins/*, same as DDEV)
+RUN composer require \
+        muckiware/facility-plugin:"*" \
+        muckiware/log-plugin:"*" \
+        --no-interaction --no-scripts \
+ && composer dump-autoload --optimize \
+ && composer install --no-dev --optimize-autoloader --no-interaction
 
 # Administration production build (no database required — verified:
 # bundle:dump, feature:dump, framework:schema and assets:install all run

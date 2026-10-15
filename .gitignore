@@ -43,3 +43,15 @@ phpstan.neon
 /custom/muckiware/core.zip
 /custom/plugins/MuckiLogPlugin/logfile.txt
 ###< muckisafe release ###
+
+# MuckiSafe plugins + restic library are cloned at Docker build time,
+# they are NOT part of the muckidrive platform
+/custom/plugins/MuckiFacilityPlugin/
+/custom/plugins/MuckiLogPlugin/
+/custom/muckiware/restic/
+
+###> local plugin checkouts (NOT part of the platform repo) ###
+/custom/plugins/MuckiFacilityPlugin/
+/custom/plugins/MuckiLogPlugin/
+/custom/muckiware/restic/
+###< local plugin checkouts ###

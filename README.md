@@ -87,7 +87,7 @@ ddev exec bin/console plugin:install --activate YourPluginName
 
 > Plugins that depend on Checkout, Storefront, products, customers or sales channels **will not run** on Muckidrive, because those parts of Shopware are not loaded.
 
-**Example:** [`MuckiLogPlugin`](custom/plugins/MuckiLogPlugin) is a Log4php-based logging plugin with a custom entity, a migration, a scheduled task and an exception subscriber.
+**Example:** [`MuckiLogPlugin`](https://github.com/muckiware/MuckiLogPlugin) (separate repository) is a Log4php-based logging plugin with a custom entity, a migration, a scheduled task and an exception subscriber.
 
 ### Conventions
 

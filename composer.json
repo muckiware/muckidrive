@@ -7,9 +7,7 @@
         "muckiware/master": "*",
         "shopware/conflicts": "*",
         "shopware/core": "~v6.7.0",
-        "symfony/flex": "~2",
-        "muckiware/facility-plugin": "^0.7",
-        "muckiware/log-plugin": "^2.4"
+        "symfony/flex": "~2"
     },
     "repositories": [
         {

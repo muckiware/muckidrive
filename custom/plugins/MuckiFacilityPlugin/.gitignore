@@ -1,9 +1,0 @@
-!vendor/muckiware/restic/*
-*.DS_Store
-var/cache/*
-/composer.lock
-/.phpunit.result.cache
-/vendor/
-/src/Resources/public/
-/var/
-/.playwright-cli/
