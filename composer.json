@@ -7,7 +7,9 @@
         "muckiware/master": "*",
         "shopware/conflicts": "*",
         "shopware/core": "~v6.7.0",
-        "symfony/flex": "~2"
+        "symfony/flex": "~2",
+        "muckiware/facility-plugin": "^0.7",
+        "muckiware/log-plugin": "^2.4"
     },
     "repositories": [
         {
@@ -46,7 +48,10 @@
             "php-http/discovery": false
         },
         "optimize-autoloader": true,
-        "sort-packages": true
+        "sort-packages": true,
+        "github-protocols": [
+            "https"
+        ]
     },
     "scripts": {
         "auto-scripts": {

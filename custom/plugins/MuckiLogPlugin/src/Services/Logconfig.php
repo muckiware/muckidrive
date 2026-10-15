@@ -1,0 +1,234 @@
+<?php declare(strict_types=1);
+/**
+ * MuckiLogPlugin plugin
+ *
+ * @category   Muckiware
+ * @package    Muckilog
+ * @copyright  Copyright (c) 2021-2024 by Muckiware
+ * @license    MIT
+ * @author     Muckiware
+ *
+ */
+
+namespace MuckiLogPlugin\Services;
+
+use Symfony\Component\HttpKernel\KernelInterface;
+
+use MuckiLogPlugin\Services\Settings as PluginSettings;
+use MuckiLogPlugin\Log4php\Logger;
+
+class Logconfig implements LogconfigInterface
+{
+    /**
+     *
+     * @var Logger|null
+     */
+    protected ?Logger $logger;
+    
+    public function __construct(
+        protected KernelInterface $kernel,
+        protected PluginSettings $pluginSettings
+    )
+    {
+        $this->logger = null;
+    }
+    
+    public function getLogger(): Logger
+    {
+        if(!$this->logger) {
+            require_once $this->pluginSettings->getLoggerPath();
+            $this->logger = Logger::getLogger('muckilog');
+        }
+
+        return $this->logger;
+    }
+
+    /**
+     * Method for to load a xml config file, if it already exists.
+     *
+     * @param string $loggerContext
+     * @return boolean
+     * @throws \DOMException
+     */
+    public function checkConfigPath(string $loggerContext = '', string $extensionContext = ''): bool
+    {
+        $configFilePath = $this->pluginSettings->getConfigPath($loggerContext, $extensionContext);
+        
+        if($this->_checkConfigFile($configFilePath, $loggerContext, $extensionContext)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @throws \DOMException
+     */
+    protected function _checkConfigFile(string $path, string $loggerContext = '', string $extensionContext = ''): bool
+    {
+        if(file_exists($path)) {
+            return true;
+        } else {
+
+            $this->_createConfigXML($path, $loggerContext, $extensionContext);
+            
+            if(file_exists($path)) {
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    /**
+     * Method to create a new log4php xml config file
+     * @param string $loggerContext
+     * @return void
+     * @throws \DOMException
+     */
+    protected function _createConfigXML(
+        string $configFilePath,
+        string $loggerContext='',
+        string $extensionContext=''
+    ): void
+    {
+        $dom = new \DomDocument('1.0', 'UTF-8');
+        
+        //add root
+        $root = $dom->appendChild($dom->createElement('configuration'));
+        
+        //add NodeA element to Root
+        $nodeAppender = $dom->createElement('appender');
+        $nodeRoot = $dom->createElement('root');
+        $root->appendChild($nodeAppender);
+        $root->appendChild($nodeRoot);
+        
+        $nodeParam1 = $dom->createElement('param');
+        $nodeAppender->appendChild($nodeParam1);
+        $nodeParam2 = $dom->createElement('param');
+        $nodeAppender->appendChild($nodeParam2);
+        $nodeParam3 = $dom->createElement('param');
+        $nodeAppender->appendChild($nodeParam3);
+        $nodeParam4 = $dom->createElement('param');
+        $nodeAppender->appendChild($nodeParam4);
+        $nodeLayout = $dom->createElement('layout');
+        $nodeAppender->appendChild($nodeLayout);
+        $nodeFilter = $dom->createElement('filter');
+        $nodeAppender->appendChild($nodeFilter);
+        
+        $nodeLayoutParam = $dom->createElement('param');
+        $nodeLayout->appendChild($nodeLayoutParam);
+        $nodeFilterParam1 = $dom->createElement('param');
+        $nodeFilter->appendChild($nodeFilterParam1);
+        $nodeFilterParam2 = $dom->createElement('param');
+        $nodeFilter->appendChild($nodeFilterParam2);
+        
+        $nodeLevel = $dom->createElement('level');
+        $nodeRoot->appendChild($nodeLevel);
+        $nodeAppenderRef = $dom->createElement('appender_ref');
+        $nodeRoot->appendChild($nodeAppenderRef);
+        
+        // Appending attr1 and attr2 to the NodeA element
+        $attr = $dom->createAttribute('xmlns');
+        $attr->appendChild($dom->createTextNode('http://logging.apache.org/log4php/'));
+        $root->appendChild($attr);
+        
+        $attr = $dom->createAttribute('name');
+        $attr->appendChild($dom->createTextNode('RollingFileAppender'));
+        $nodeAppender->appendChild($attr);
+        
+        $attr = $dom->createAttribute('class');
+        $attr->appendChild($dom->createTextNode('MuckiLogPlugin\Log4php\Appenders\LoggerAppenderRollingFile'));
+        $nodeAppender->appendChild($attr);
+        
+        $attr = $dom->createAttribute('name');
+        $attr->appendChild($dom->createTextNode('file'));
+        $nodeParam1->appendChild($attr);
+        $attr = $dom->createAttribute('value');
+        $attr->appendChild($dom->createTextNode(
+            $this->pluginSettings->getLoggerFileName(
+                $loggerContext,
+                $extensionContext
+            )
+        ));
+        $nodeParam1->appendChild($attr);
+        
+        $attr = $dom->createAttribute('name');
+        $attr->appendChild($dom->createTextNode('maxBackupIndex'));
+        $nodeParam2->appendChild($attr);
+        $attr = $dom->createAttribute('value');
+        $attr->appendChild($dom->createTextNode($this->pluginSettings->getMaxBackupIndex()));
+        $nodeParam2->appendChild($attr);
+
+        $attr = $dom->createAttribute('name');
+        $attr->appendChild($dom->createTextNode('maxFileSize'));
+        $nodeParam3->appendChild($attr);
+        $attr = $dom->createAttribute('value');
+        $attr->appendChild($dom->createTextNode($this->pluginSettings->getMaxFileSize()));
+        $nodeParam3->appendChild($attr);
+
+        $attr = $dom->createAttribute('name');
+        $attr->appendChild($dom->createTextNode('compress'));
+        $nodeParam4->appendChild($attr);
+        $attr = $dom->createAttribute('value');
+        $attr->appendChild($dom->createTextNode($this->pluginSettings->isEnabledCompress() ? 'true' : 'false'));
+        $nodeParam4->appendChild($attr);
+        
+        $attr = $dom->createAttribute('class');
+        $attr->appendChild($dom->createTextNode('MuckiLogPlugin\Log4php\layouts\LoggerLayoutPattern'));
+        $nodeLayout->appendChild($attr);
+        
+        $attr = $dom->createAttribute('class');
+        $attr->appendChild($dom->createTextNode('MuckiLogPlugin\Log4php\Filters\LoggerFilterLevelRange'));
+        $nodeFilter->appendChild($attr);
+        
+        $attr = $dom->createAttribute('name');
+        $attr->appendChild($dom->createTextNode('conversionPattern'));
+        $nodeLayoutParam->appendChild($attr);
+        $attr = $dom->createAttribute('value');
+        $attr->appendChild($dom->createTextNode($this->pluginSettings->getConversionPattern()));
+        $nodeLayoutParam->appendChild($attr);
+        
+        $attr = $dom->createAttribute('name');
+        $attr->appendChild($dom->createTextNode('levelMin'));
+        $nodeFilterParam1->appendChild($attr);
+        $attr = $dom->createAttribute('value');
+        $attr->appendChild($dom->createTextNode($this->pluginSettings->getLoglevel()));
+        $nodeFilterParam1->appendChild($attr);
+        
+        $attr = $dom->createAttribute('name');
+        $attr->appendChild($dom->createTextNode('acceptOnMatch'));
+        $nodeFilterParam2->appendChild($attr);
+        $attr = $dom->createAttribute('value');
+        $attr->appendChild($dom->createTextNode('false'));
+        $nodeFilterParam2->appendChild($attr);
+        
+        $attr = $dom->createAttribute('value');
+        $attr->appendChild($dom->createTextNode('DEBUG'));
+        $nodeLevel->appendChild($attr);
+        
+        $attr = $dom->createAttribute('ref');
+        $attr->appendChild($dom->createTextNode('RollingFileAppender'));
+        $nodeAppenderRef->appendChild($attr);
+        
+        $dom->formatOutput = true; // set the formatOutput attribute of domDocument to true
+        
+        // save XML as string or file
+        try {
+            $dom->save($configFilePath);
+        } catch (\Exception $e) {
+            echo 'Error: '.$e->getMessage();
+        }
+    }
+    
+    public function removeLogConfigFiles($path): void
+    {
+        foreach(glob($path.'/logconfig.*') as $file) {
+
+            if(is_file($file)) {
+                unlink($file);
+            }
+        }
+    }
+}
+
