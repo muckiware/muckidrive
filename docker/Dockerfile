@@ -7,8 +7,9 @@
 # The MuckiSafe image adds them when it is built:
 #   - MuckiFacilityPlugin (github.com/muckiware/MuckiFacilityPlugin, tag below)
 #   - MuckiLogPlugin     (github.com/muckiware/MuckiLogPlugin, tag below)
-# The restic PHP client library (muckiware/restic) is vendored in the platform
-# repository under custom/muckiware/restic (path repo, see composer.json).
+# The restic PHP client library (muckiware/restic, no Packagist) is cloned at
+# build time as well — the custom/muckiware/* path repo in composer.json
+# picks it up.
 
 # ---------------------------------------------------------------------------
 # Stage 1: dependencies + administration build (discarded afterwards)
@@ -46,11 +47,16 @@ COPY custom/muckiware ./custom/muckiware
 # --- MuckiSafe additions: plugins cloned from their public GitHub tags -----
 # muckidrive is a general platform — plugins do NOT live in its repository.
 # The image adds MuckiFacilityPlugin and MuckiLogPlugin at build time.
+# The restic PHP client library is a facility-plugin dependency that is not
+# on Packagist — it is cloned as well and picked up by the existing
+# custom/muckiware/* path repository in composer.json.
 ARG FACILITY_PLUGIN_REF=v0.7.0
 ARG LOG_PLUGIN_REF=v2.4.0
+ARG RESTIC_LIB_REF=v1.5.0
 RUN git clone --depth 1 --branch ${FACILITY_PLUGIN_REF} https://github.com/muckiware/MuckiFacilityPlugin.git custom/plugins/MuckiFacilityPlugin \
  && git clone --depth 1 --branch ${LOG_PLUGIN_REF} https://github.com/muckiware/MuckiLogPlugin.git custom/plugins/MuckiLogPlugin \
- && rm -rf custom/plugins/MuckiFacilityPlugin/.git custom/plugins/MuckiLogPlugin/.git
+ && git clone --depth 1 --branch ${RESTIC_LIB_REF} https://github.com/muckiware/restic.git custom/muckiware/restic \
+ && rm -rf custom/plugins/MuckiFacilityPlugin/.git custom/plugins/MuckiLogPlugin/.git custom/muckiware/restic/.git
 
 # muckidrive does not load the Shopware storefront bundle. The MuckiLogPlugin
 # storefront ErrorControllerDecorator (shipped in v2.4.0) decorates a service
