@@ -29,8 +29,10 @@ jobs:
 
       - name: Guard against gitlinks (empty directories in CI clones)
         run: |
-          if git ls-files -s | awk '$1 == "160000"'; then
-            echo "::error::Mode-160000 gitlink entries found - CI clones would contain empty directories"
+          gitlinks=$(git ls-files -s | awk '$1 == 160000')
+          if [ -n "$gitlinks" ]; then
+            echo "::error::Mode-160000 gitlink entries found - CI clones would contain empty directories:"
+            echo "$gitlinks"
             exit 1
           fi
 
