@@ -1,0 +1,75 @@
+name: Release
+
+# Shopware-style release flow, scaled down: a pushed v* tag must prove it
+# installs via composer create-project, then the GitHub release is published
+# with notes generated from changelog/release-<x-y-z>/ and the MuckiSafe
+# image build is triggered with the platform tag pinned.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  verify-dist:
+    name: Verify the tag installs via composer create-project
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, curl, dom, fileinfo, filter, gd, intl, mbstring, openssl, pdo, pdo_mysql, session, simplexml, sodium, xml, xmlreader, zip, zlib
+          coverage: none
+
+      - name: composer create-project smoke test
+        run: |
+          composer create-project muckiware/muckidrive dist-test \
+            --repository="{\"type\":\"vcs\",\"url\":\"$GITHUB_WORKSPACE\"}" \
+            --no-interaction --no-progress
+
+  release:
+    name: GitHub release + MuckiSafe trigger
+    needs: verify-dist
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate release notes
+        run: |
+          mkdir -p .github-out
+          bash .github/bin/generate-release-notes.sh "$GITHUB_REF_NAME" > .github-out/notes.md
+          cat .github-out/notes.md
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Release $GITHUB_REF_NAME" \
+            --notes-file .github-out/notes.md
+
+      - name: Trigger MuckiSafe image build
+        env:
+          DISPATCH_TOKEN: ${{ secrets.MUCKISAFE_DISPATCH_TOKEN }}
+        run: |
+          if [ -z "$DISPATCH_TOKEN" ]; then
+            echo "::warning::MUCKISAFE_DISPATCH_TOKEN is not set - skipping the MuckiSafe image build trigger."
+            echo "Add a fine-grained PAT with 'actions: write' on muckiware/MuckiSafe as a repository secret to enable it."
+            exit 0
+          fi
+          curl -sSf -X POST \
+            -H "Authorization: Bearer $DISPATCH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/muckiware/MuckiSafe/dispatches \
+            -d "{\"event_type\":\"muckidrive-release\",\"client_payload\":{\"muckidrive_ref\":\"$GITHUB_REF_NAME\"}}"

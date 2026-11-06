@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  platform:
+    name: Platform (composer + PHPStan)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, curl, dom, fileinfo, filter, gd, intl, mbstring, openssl, pdo, pdo_mysql, session, simplexml, sodium, xml, xmlreader, zip, zlib
+          coverage: none
+
+      - name: Guard against gitlinks (empty directories in CI clones)
+        run: |
+          if git ls-files -s | awk '$1 == "160000"'; then
+            echo "::error::Mode-160000 gitlink entries found - CI clones would contain empty directories"
+            exit 1
+          fi
+
+      - name: Composer validate
+        run: composer validate
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --no-progress
+
+  administration:
+    name: Administration build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, curl, dom, fileinfo, filter, gd, intl, mbstring, openssl, pdo, pdo_mysql, session, simplexml, sodium, xml, xmlreader, zip, zlib
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress
+
+      - name: Build administration
+        run: bin/build-administration.sh
