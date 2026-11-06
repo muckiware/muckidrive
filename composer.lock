@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "14ad996eb4bec2fea71020102572e5f4",
+    "content-hash": "693479b2b16cb6503b383d46168bc691",
     "packages": [
         {
             "name": "brick/math",
@@ -3498,7 +3498,7 @@
             "dist": {
                 "type": "path",
                 "url": "custom/muckiware/core",
-                "reference": "6f305ccea659199734ec13480eab683aba4dd775"
+                "reference": "d680130d6c1514d8fbdc90b31c62a99decbb11ef"
             },
             "require": {
                 "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0"
@@ -3524,7 +3524,7 @@
             "dist": {
                 "type": "path",
                 "url": "custom/muckiware/master",
-                "reference": "f1001a0edd0d328358341bb58444cb30cfccdbea"
+                "reference": "fbc3efe0991e9a0361adf3ef42dabf3ad98eb924"
             },
             "require": {
                 "doctrine/dbal": "~4.4.0",
@@ -12696,7 +12696,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-08T21:09:11+00:00"
+            "time": "2026-10-08T21:09:11+00:00",
+            "published-time": "2026-10-08T21:09:23+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

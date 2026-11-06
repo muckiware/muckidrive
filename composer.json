@@ -1,5 +1,7 @@
 {
-    "license": "proprietary",
+    "name": "muckiware/muckidrive",
+    "description": "Muckidrive - Shopware 6.7 Core as an application framework, without shop context",
+    "license": "MIT",
     "type": "project",
     "require": {
         "composer-runtime-api": "^2.0",
