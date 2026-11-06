@@ -153,7 +153,7 @@ jobs:
         run: |
           if [ -z "$DISPATCH_TOKEN" ]; then
             echo "::warning::MUCKISAFE_DISPATCH_TOKEN is not set - skipping the MuckiSafe image build trigger."
-            echo "Add a fine-grained PAT with 'actions: write' on muckiware/MuckiSafe as a repository secret to enable it."
+            echo "Add a fine-grained PAT with 'contents: write' on muckiware/MuckiSafe as a repository secret to enable it."
             exit 0
           fi
           HTTP_CODE=$(curl -sS -o dispatch-response.json -w '%{http_code}' -X POST \

@@ -4,3 +4,4 @@ author: tfreyda
 ---
 - Retrying a release via workflow dispatch with the same version no longer fails on the existing tag or GitHub release - both steps are skipped when they already exist
 - The MuckiSafe dispatch step reports the HTTP status and the GitHub error body instead of failing with a bare exit code, so rejected dispatch tokens are immediately diagnosable
+- The MuckiSafe dispatch token requires the fine-grained repository permission "Contents: read and write" - the repository_dispatch REST endpoint is not covered by "Actions: read and write" alone
