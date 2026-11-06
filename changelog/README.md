@@ -18,6 +18,13 @@ There is no single big `CHANGELOG.md` - the folders are the changelog, and the r
 
 ## Release procedure
 
-1. `mkdir changelog/release-<x-y-z>` and move all entries from `_unreleased/` into it
-2. Commit, tag `v<x.y.z>` and push the tag
-3. The [release workflow](../.github/workflows/release.yml) generates the notes from the folder, verifies the tag installs via `composer create-project`, publishes the GitHub release and triggers the MuckiSafe image build
+1. Develop on `main` with one entry per change in `_unreleased/`
+2. Merge `main` into the `release` branch (a fast-forward merge keeps the post-release sync simple) and push - the [release workflow](../.github/workflows/release.yml) does the rest automatically:
+   - verifies the tree installs via `composer create-project`
+   - computes the next version: patch bump of the latest `v*` tag (override via *Run workflow* on the `release` branch with the `version` input)
+   - moves all entries from `_unreleased/` into `changelog/release-<x-y-z>/`, commits the move with `[skip ci]` and fast-forwards `main`
+   - tags, publishes the GitHub release with the generated notes and triggers the MuckiSafe image build
+
+If a release run fails halfway, retry with *Run workflow* and the intended version - the workflow skips the tag and the changelog move if they already exist.
+
+> Note: the workflow pushes to `release` and `main`, so the `release` branch must stay unprotected (or allow pushes from GitHub Actions).

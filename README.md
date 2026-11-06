@@ -158,9 +158,9 @@ ddev exec bin/console plugin:install --activate YourPluginName
 
 ## Releases & changelog
 
-- Every user-visible change gets an entry in [`changelog/_unreleased/`](changelog/README.md) - one small markdown file per change.
-- For a release the entries move to `changelog/release-<x-y-z>/` and a Git tag `v<x.y.z>` is pushed.
-- The [release workflow](.github/workflows/release.yml) then verifies that the tag installs via `composer create-project`, generates the release notes from the changelog folder, publishes the GitHub release and triggers the MuckiSafe image build.
+- Development happens on `main`; every user-visible change gets an entry in [`changelog/_unreleased/`](changelog/README.md) - one small markdown file per change.
+- A release version is created **only** by merging (or pushing) `main` into the **`release`** branch. The [release workflow](.github/workflows/release.yml) then verifies the tree installs via `composer create-project`, computes the next version (patch bump of the latest tag - an explicit version can be given via *Run workflow*), moves the unreleased changelog entries into `changelog/release-<x-y-z>/` (syncing the move back to `main`), tags, publishes the GitHub release and triggers the MuckiSafe image build.
+- Pushing a Git tag alone does nothing - versions are created only through the `release` branch.
 
 The ready-to-run Docker distribution (MuckiSafe, `ghcr.io/muckiware/muckisafe`) lives in [muckiware/MuckiSafe](https://github.com/muckiware/MuckiSafe).
 
