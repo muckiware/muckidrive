@@ -1,0 +1,12 @@
+# Exclude repository-only files from Composer dist archives (create-project,
+# `composer archive`, Packagist dist downloads). Users installing muckidrive via
+# `composer create-project` get a clean application tree without repo tooling.
+/.github export-ignore
+/changelog export-ignore
+/tests export-ignore
+/CLAUDE.md export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/compose.override.yaml export-ignore
+/phpstan.dist.neon export-ignore
+/phpunit.xml.dist export-ignore

@@ -21,6 +21,65 @@ custom/plugins/*        ← Your web services, built as regular Shopware plugins
 
 ## Getting started
 
+### Install via Composer
+
+```bash
+composer create-project muckiware/muckidrive my-project
+```
+
+> This works out of the box once `muckiware/muckidrive` is listed on Packagist.
+> Until then, pass the GitHub repository explicitly:
+>
+> ```bash
+> composer create-project muckiware/muckidrive my-project \
+>   --repository='{"type":"vcs","url":"https://github.com/muckiware/muckidrive"}'
+> ```
+
+The created project is a ready platform checkout: dependencies installed, autoload dumped, `vendor/muckiware/*` symlinked to the vendored sources in `custom/muckiware/*`.
+
+### Or clone the repository
+
+```bash
+git clone https://github.com/muckiware/muckidrive.git my-project
+cd my-project
+composer install
+```
+
+### First boot
+
+1. Create the environment file and fill in your values:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   - `DATABASE_URL` - MySQL 8 database
+   - `APP_SECRET` / `INSTANCE_ID` - generate with `openssl rand -hex 32` and `openssl rand -base64 24 | tr -d /+`
+   - `MUCKIWARE_ROOT` - absolute project path (`/var/www/html` inside DDEV)
+
+2. Install the database and the basic system setup:
+
+   ```bash
+   bin/console system:install --create-database \
+     --shop-name "My project" --shop-email "admin@example.com" --shop-locale "en-GB" \
+     --skip-assets-install --skip-first-run-wizard --no-assign-theme
+   ```
+
+3. Create an admin user:
+
+   ```bash
+   bin/console user:create --admin --password <password> --email admin@example.com \
+     --firstName Admin --lastName User admin
+   ```
+
+4. Build the administration UI:
+
+   ```bash
+   bin/build-administration.sh
+   ```
+
+In DDEV, prefix the console with `ddev exec` (`ddev exec bin/console ...`) so PHP 8.4 from the container is used.
+
 ## Architecture
 
 ### Active bundles
@@ -96,6 +155,14 @@ ddev exec bin/console plugin:install --activate YourPluginName
 - Services are defined in XML (`services.xml`)
 - To extend Shopware Core services, use decorators (`XyzDecorator` decorates `Xyz`)
 - Code, comments, commits and docs are written in English
+
+## Releases & changelog
+
+- Every user-visible change gets an entry in [`changelog/_unreleased/`](changelog/README.md) - one small markdown file per change.
+- For a release the entries move to `changelog/release-<x-y-z>/` and a Git tag `v<x.y.z>` is pushed.
+- The [release workflow](.github/workflows/release.yml) then verifies that the tag installs via `composer create-project`, generates the release notes from the changelog folder, publishes the GitHub release and triggers the MuckiSafe image build.
+
+The ready-to-run Docker distribution (MuckiSafe, `ghcr.io/muckiware/muckisafe`) lives in [muckiware/MuckiSafe](https://github.com/muckiware/MuckiSafe).
 
 ## License
 
