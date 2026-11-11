@@ -1,3 +1,18 @@
+# Base entries for every muckidrive project. Symfony Flex appends and
+# maintains its own `###> vendor/package ###` blocks below.
+/vendor/
+/.env
+/.env.dev
+/.env.test
+/auth.json
+/install.lock
+/parameters.txt
+/.uniqueid.txt
+.DS_Store
+**/.DS_Store
+**/.phpunit.result.cache
+**/node_modules/
+/.idea/
 
 ###> shopware/core ###
 .env.local
@@ -26,33 +41,17 @@ phpstan.neon
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 
-###> muckisafe release ###
-.DS_Store
-**/.DS_Store
-**/.phpunit.result.cache
-**/node_modules/
-/vendor/
-/.env
-/.env.dev
-/.env.test
-/parameters.txt
-/.uniqueid.txt
-/.idea/
-/.playwright-mcp/
+# --- muckidrive repository / dev workspace only -------------------------------
+# The skeleton repository does not commit a lock file. In your own project,
+# remove the next line and commit composer.lock.
+/composer.lock
 /.ddev/
+/.playwright-mcp/
 /custom/muckiware/core.zip
 /custom/plugins/MuckiLogPlugin/logfile.txt
-###< muckisafe release ###
 
-# MuckiSafe plugins + restic library are cloned at Docker build time,
+# MuckiSafe plugins and the restic library are cloned at Docker build time,
 # they are NOT part of the muckidrive platform
 /custom/plugins/MuckiFacilityPlugin/
 /custom/plugins/MuckiLogPlugin/
 /custom/muckiware/restic/
-
-###> local plugin checkouts (NOT part of the platform repo) ###
-/custom/plugins/MuckiFacilityPlugin/
-/custom/plugins/MuckiLogPlugin/
-/custom/muckiware/restic/
-###< local plugin checkouts ###
-/composer.lock

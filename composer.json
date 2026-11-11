@@ -5,8 +5,8 @@
     "type": "project",
     "require": {
         "composer-runtime-api": "^2.0",
-        "muckiware/core": "*",
-        "muckiware/master": "*",
+        "muckiware/core": ">=0.0.2 <0.2",
+        "muckiware/master": ">=0.0.1 <0.1",
         "shopware/conflicts": "*",
         "symfony/flex": "~2"
     },
@@ -67,6 +67,7 @@
         "symfony": {
             "allow-contrib": true,
             "endpoint": [
+                "https://raw.githubusercontent.com/muckiware/recipes/flex/main/index.json",
                 "https://raw.githubusercontent.com/shopware/recipes/flex/main/index.json",
                 "flex://defaults"
             ]
