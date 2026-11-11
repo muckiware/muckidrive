@@ -30,7 +30,7 @@ concurrency:
 
 jobs:
   verify-dist:
-    name: Verify the release tree installs via composer create-project
+    name: Verify the release dist installs via composer create-project
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
@@ -45,12 +45,67 @@ jobs:
           extensions: ctype, curl, dom, fileinfo, filter, gd, intl, mbstring, openssl, pdo, pdo_mysql, session, simplexml, sodium, xml, xmlreader, zip, zlib
           coverage: none
 
-      - name: composer create-project smoke test (release branch HEAD)
+      # Test the REAL dist: Packagist serves GitHub zipballs (= git archive), which
+      # honour export-ignore in .gitattributes. A `vcs` repository would install
+      # from the git source and ship the dev workspace files (symfony.lock,
+      # config/, public/, ...) - then no recipe would run and the test would
+      # prove nothing. So build the zip with git archive and install it via a
+      # `package` repository with a `zip` dist.
+      - name: Build the dist archive (honours export-ignore)
         run: |
-          composer create-project muckiware/muckidrive dist-test dev-release \
-            --stability=dev \
-            --repository="{\"type\":\"vcs\",\"url\":\"$GITHUB_WORKSPACE\"}" \
+          mkdir -p "$RUNNER_TEMP/dist"
+          git archive --format=zip -o "$RUNNER_TEMP/dist/muckidrive.zip" HEAD
+          echo "Dist archive contents:"
+          unzip -Z1 "$RUNNER_TEMP/dist/muckidrive.zip"
+
+      # NOTE: this step needs the muckiware/recipes Flex endpoint to be live:
+      # https://raw.githubusercontent.com/muckiware/recipes/flex/main/index.json
+      # (first entry in extra.symfony.endpoint). Without it, Flex falls back to
+      # the shopware/core recipe and the assertions below fail.
+      #
+      # Composer >= 2.9 blocks installs with security advisories. The mcp/sdk
+      # advisory (via shopware/core) is accepted in composer.json config.audit.ignore;
+      # remove that entry once shopware/core ships a fixed mcp/sdk.
+      - name: composer create-project smoke test (dist archive of the release HEAD)
+        run: |
+          REPO=$(jq -c \
+            --arg url "$RUNNER_TEMP/dist/muckidrive.zip" \
+            '{type: "package", package: (. + {version: "0.0.0", dist: {type: "zip", url: $url}})}' \
+            composer.json)
+          composer create-project muckiware/muckidrive "$RUNNER_TEMP/dist-test" 0.0.0 \
+            --repository="$REPO" \
             --no-interaction --no-progress
+
+      - name: Assert that the Flex recipes ran
+        working-directory: ${{ runner.temp }}/dist-test
+        run: |
+          fail() { echo "::error::$1"; exit 1; }
+
+          test -f public/index.php || fail "public/index.php missing - the muckiware/core recipe did not run"
+          test -f bin/console || fail "bin/console missing - the muckiware/core recipe did not run"
+          test -f bin/build-administration.sh || fail "bin/build-administration.sh missing - the muckiware/master recipe did not run"
+          test -f config/bundles.php || fail "config/bundles.php missing"
+
+          grep -qF 'Muckiware\Core\Framework\Framework::class' config/bundles.php \
+            || fail 'config/bundles.php does not register Muckiware\Core\Framework\Framework'
+          grep -qF 'Muckiware\Master\Administration::class' config/bundles.php \
+            || fail 'config/bundles.php does not register Muckiware\Master\Administration'
+          if grep -qF 'Shopware\Core\Checkout\Checkout' config/bundles.php; then
+            fail 'config/bundles.php contains Shopware\Core\Checkout\Checkout - the shopware/core recipe ran instead of the muckiware override'
+          fi
+          if grep -qF 'Shopware\Core\Framework\Framework::class' config/bundles.php; then
+            fail 'config/bundles.php contains Shopware\Core\Framework\Framework - the shopware/core recipe ran instead of the muckiware override'
+          fi
+
+          jq -e '."muckiware/core".recipe' symfony.lock >/dev/null \
+            || fail 'symfony.lock has no muckiware/core recipe entry'
+          jq -e '."muckiware/master".recipe' symfony.lock >/dev/null \
+            || fail 'symfony.lock has no muckiware/master recipe entry'
+          jq -e '."shopware/core".recipe.repo | test("muckiware/recipes")' symfony.lock >/dev/null \
+            || fail 'the shopware/core recipe was not taken from muckiware/recipes - check the endpoint order'
+
+          echo "Recipes applied:"
+          jq -r 'to_entries[] | "\(.key): \(.value.recipe.repo // "-") \(.value.recipe.version // "")"' symfony.lock
 
   release:
     name: Version, tag, GitHub release + MuckiSafe trigger

@@ -5,7 +5,6 @@ return [
     Muckiware\Core\Framework\Framework::class => ['all' => true],
     Muckiware\Core\System\System::class => ['all' => true],
     Muckiware\Core\Content\Content::class => ['all' => true],
-//    Shopware\Core\Checkout\Checkout::class => ['all' => true],
     Shopware\Core\Maintenance\Maintenance::class => ['all' => true],
     Shopware\Core\DevOps\DevOps::class => ['e2e' => true],
     Shopware\Core\Profiling\Profiling::class => ['all' => true],
@@ -17,4 +16,5 @@ return [
     Muckiware\Master\Administration::class => ['all' => true],
     Symfony\UX\TwigComponent\TwigComponentBundle::class => ['all' => true],
     Symfony\AI\McpBundle\McpBundle::class => ['all' => true],
+    Muckiware\Core\Installer\MuckidriveInstaller::class => ['all' => true],
 ];
