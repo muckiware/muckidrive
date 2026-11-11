@@ -55,3 +55,19 @@ phpstan.neon
 /custom/plugins/MuckiFacilityPlugin/
 /custom/plugins/MuckiLogPlugin/
 /custom/muckiware/restic/
+
+###> muckiware/core ###
+/vendor/
+.env.local
+.env.local.php
+.env.*.local
+/public/bundles/*
+/public/media/*
+/public/thumbnail/*
+/files/*
+!/files/.htaccess
+/var/*
+!/var/.htaccess
+/auth.json
+/install.lock
+###< muckiware/core ###

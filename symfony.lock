@@ -8,6 +8,47 @@
             "ref": "87424683adc81d7dc305eefec1fced883084aab9"
         }
     },
+    "muckiware/core": {
+        "version": "0.1",
+        "recipe": {
+            "repo": "github.com/muckiware/recipes",
+            "branch": "main",
+            "version": "0.1",
+            "ref": "a2a57dcadbb11da359ce423cf257b5314e074149"
+        },
+        "files": [
+            "bin/.htaccess",
+            "bin/build-js.sh",
+            "bin/ci",
+            "bin/console",
+            "bin/functions.sh",
+            "config/jwt/.gitignore",
+            "custom/.htaccess",
+            "custom/apps/.gitignore",
+            "custom/plugins/.gitignore",
+            "custom/static-plugins/.gitignore",
+            "files/.htaccess",
+            "public/.htaccess.dist",
+            "public/index.php",
+            "public/maintenance.html",
+            "var/.htaccess",
+            ".htaccess"
+        ]
+    },
+    "muckiware/master": {
+        "version": "0.0",
+        "recipe": {
+            "repo": "github.com/muckiware/recipes",
+            "branch": "main",
+            "version": "0.0",
+            "ref": "c3574e43e26b7fadd244f3eede5cfdb00153017f"
+        },
+        "files": [
+            "bin/build-administration.sh",
+            "bin/build-dev-administration.sh",
+            "bin/watch-administration.sh"
+        ]
+    },
     "nyholm/psr7": {
         "version": "1.8",
         "recipe": {
@@ -70,29 +111,11 @@
     "shopware/core": {
         "version": "6.7",
         "recipe": {
-            "repo": "github.com/shopware/recipes",
+            "repo": "github.com/muckiware/recipes",
             "branch": "main",
             "version": "6.7",
-            "ref": "3a9e7f8428dbada09530cb35bf072303e108e597"
-        },
-        "files": [
-            "bin/.htaccess",
-            "bin/build-js.sh",
-            "bin/ci",
-            "bin/console",
-            "bin/functions.sh",
-            "config/jwt/.gitignore",
-            "custom/.htaccess",
-            "custom/apps/.gitignore",
-            "custom/plugins/.gitignore",
-            "custom/static-plugins/.gitignore",
-            "files/.htaccess",
-            "public/.htaccess.dist",
-            "public/index.php",
-            "public/maintenance.html",
-            "var/.htaccess",
-            ".htaccess"
-        ]
+            "ref": "d32e315a88bceba00fcc0cf7c748da7651f8b0b8"
+        }
     },
     "symfony/console": {
         "version": "7.4",
@@ -160,7 +183,13 @@
         }
     },
     "symfony/mcp-bundle": {
-        "version": "v0.13.0"
+        "version": "0.14",
+        "recipe": {
+            "repo": "github.com/muckiware/recipes",
+            "branch": "main",
+            "version": "0.1",
+            "ref": "25ac2a21f70569b4fe225f495824cff3fce5f9d8"
+        }
     },
     "symfony/messenger": {
         "version": "7.4",
