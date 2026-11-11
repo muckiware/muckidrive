@@ -5,8 +5,8 @@
     "type": "project",
     "require": {
         "composer-runtime-api": "^2.0",
-        "muckiware/core": "*",
-        "muckiware/master": "*",
+        "muckiware/core": ">=0.0.2 <0.2",
+        "muckiware/master": ">=0.0.1 <0.1",
         "shopware/conflicts": "*",
         "symfony/flex": "~2"
     },
@@ -46,6 +46,11 @@
             "symfony/runtime": true,
             "php-http/discovery": false
         },
+        "audit": {
+            "ignore": {
+                "PKSA-s52d-n7sx-trsg": "mcp/sdk (required by shopware/core) - accepted until shopware/core ships a fixed mcp/sdk"
+            }
+        },
         "optimize-autoloader": true,
         "sort-packages": true,
         "github-protocols": [
@@ -67,6 +72,7 @@
         "symfony": {
             "allow-contrib": true,
             "endpoint": [
+                "https://raw.githubusercontent.com/muckiware/recipes/flex/main/index.json",
                 "https://raw.githubusercontent.com/shopware/recipes/flex/main/index.json",
                 "flex://defaults"
             ]
