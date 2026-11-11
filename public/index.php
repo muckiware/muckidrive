@@ -2,7 +2,7 @@
 
 use Shopware\Core\DevOps\Environment\EnvironmentHelper;
 use Shopware\Core\Framework\Plugin\KernelPluginLoader\ComposerPluginLoader;
-use Shopware\Core\Installer\InstallerKernel;
+use Muckiware\Core\Installer\InstallerKernel;
 use Shopware\Core\Framework\Adapter\Kernel\KernelFactory;
 
 $_SERVER['SCRIPT_FILENAME'] = __FILE__;
