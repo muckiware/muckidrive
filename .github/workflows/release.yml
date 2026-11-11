@@ -63,11 +63,9 @@ jobs:
       # (first entry in extra.symfony.endpoint). Without it, Flex falls back to
       # the shopware/core recipe and the assertions below fail.
       #
-      # TODO(security-advisories): Composer >= 2.9 blocks the install because of
-      # security advisories on mcp/sdk (required by shopware/core 6.7.15/16) and
-      # dompdf. Whether to ignore them (config.audit) is an open maintainer
-      # decision - deliberately NOT configured here, so this step fails until
-      # the advisories are resolved or explicitly accepted in composer.json.
+      # Composer >= 2.9 blocks installs with security advisories. The mcp/sdk
+      # advisory (via shopware/core) is accepted in composer.json config.audit.ignore;
+      # remove that entry once shopware/core ships a fixed mcp/sdk.
       - name: composer create-project smoke test (dist archive of the release HEAD)
         run: |
           REPO=$(jq -c \

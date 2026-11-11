@@ -46,6 +46,11 @@
             "symfony/runtime": true,
             "php-http/discovery": false
         },
+        "audit": {
+            "ignore": {
+                "PKSA-s52d-n7sx-trsg": "mcp/sdk (required by shopware/core) - accepted until shopware/core ships a fixed mcp/sdk"
+            }
+        },
         "optimize-autoloader": true,
         "sort-packages": true,
         "github-protocols": [

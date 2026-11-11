@@ -37,7 +37,7 @@ composer create-project muckiware/muckidrive my-project
 
 `composer create-project` downloads a thin skeleton (essentially `composer.json`) and installs the packages. [Symfony Flex](https://symfony.com/doc/current/setup/flex.html) then generates the project files from the muckidrive recipes ([muckiware/recipes](https://github.com/muckiware/recipes)): `public/index.php`, `bin/console`, `bin/build-*.sh`, the `.htaccess` files, `config/bundles.php` (without Checkout/Storefront), `.env` and the `custom/*` directories. Because these files come from recipes, they can be updated later - see [Updating](#updating).
 
-Initialize a git repository and commit right away - recipe updates are applied as a 3-way merge on a clean working tree. Remove the `/composer.lock` line from the `.gitignore` first (it only applies to the skeleton repository), so the lock file of your project is committed:
+Initialize a git repository and commit right away, including `composer.lock` - recipe updates are applied as a 3-way merge on a clean working tree:
 
 ```bash
 cd my-project

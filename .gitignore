@@ -1,5 +1,6 @@
-# Base entries for every muckidrive project. Symfony Flex appends and
-# maintains its own `###> vendor/package ###` blocks below.
+# Ignores of the muckidrive repository (skeleton + dev workspace). This file is
+# export-ignored, so it is NOT shipped: new projects get their .gitignore from
+# the Flex recipes. Symfony Flex maintains the `###> vendor/package ###` blocks.
 /vendor/
 /.env
 /.env.dev
@@ -42,8 +43,7 @@ phpstan.neon
 ###< phpunit/phpunit ###
 
 # --- muckidrive repository / dev workspace only -------------------------------
-# The skeleton repository does not commit a lock file. In your own project,
-# remove the next line and commit composer.lock.
+# The skeleton repository does not commit a lock file (projects created from it do).
 /composer.lock
 /.ddev/
 /.playwright-mcp/

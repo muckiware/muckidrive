@@ -18,6 +18,9 @@
 /CLAUDE.md export-ignore
 /.gitattributes export-ignore
 /compose.override.yaml export-ignore
+# Dev workspace ignores (composer.lock, .ddev, MuckiSafe build artefacts). A new
+# project gets its .gitignore from the recipes (muckiware/core adds /vendor/).
+/.gitignore export-ignore
 
 # --- Flex state: without it, every recipe runs on create-project -------------
 /symfony.lock export-ignore
