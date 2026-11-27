@@ -74,7 +74,13 @@ else
     echo "Cannot check extensions for required npm installations as jq is not installed"
 fi
 
-(cd "${ADMIN_ROOT}"/Resources/app/administration && npm install --prefer-offline --production)
+# Keep the devDependencies (Jest, ESLint, ...) for local development, CI only needs the build tooling.
+NPM_INSTALL_ARGS=(--prefer-offline --no-audit)
+if [[ ${CI:-""} ]]; then
+    NPM_INSTALL_ARGS+=(--omit=dev)
+fi
+
+(cd "${ADMIN_ROOT}"/Resources/app/administration && npm install "${NPM_INSTALL_ARGS[@]}")
 
 echo "ADMIN_ROOT ${ADMIN_ROOT}"
 # Dump entity schema
