@@ -50,9 +50,25 @@ else
     BIN_TOOL=("${CWD}/console")
 fi
 
+# When console commands run in the DDEV container while npm runs on the host, files written on
+# one side (var/plugins.json, the entity schema, the built assets) are not immediately visible on
+# the other side with DDEV's Mutagen file sync. Flush the sync before crossing that boundary.
+sync_ddev_files() {
+    if [[ "${BIN_TOOL[0]}" == "ddev" ]]; then
+        ddev mutagen sync >/dev/null 2>&1 || true
+    fi
+}
+
+# Keep the devDependencies (Jest, ESLint, ...) for local development, CI only needs the build tooling.
+NPM_INSTALL_ARGS=(--prefer-offline --no-audit)
+if [[ ${CI:-""} ]]; then
+    NPM_INSTALL_ARGS+=(--omit=dev)
+fi
+
 # build admin
 [[ ${SHOPWARE_SKIP_BUNDLE_DUMP:-""} ]] || "${BIN_TOOL[@]}" bundle:dump
 "${BIN_TOOL[@]}" feature:dump || true
+sync_ddev_files
 
 if [[ $(command -v jq) ]]; then
     OLDPWD=$(pwd)
@@ -82,7 +98,7 @@ else
     echo "Cannot check extensions for required npm installations as jq is not installed"
 fi
 
-(cd "${ADMIN_ROOT}"/Resources/app/administration && npm install --prefer-offline --production)
+(cd "${ADMIN_ROOT}"/Resources/app/administration && npm install "${NPM_INSTALL_ARGS[@]}")
 
 echo "ADMIN_ROOT ${ADMIN_ROOT}"
 # Dump entity schema
@@ -94,8 +110,10 @@ if [[ -z "${SHOPWARE_SKIP_ENTITY_SCHEMA_DUMP:-""}" ]] && [[ -f "${ADMIN_ROOT}"/R
     SCHEMA_FILE="${SCHEMA_FILE#"${PROJECT_ROOT}"/}"
   fi
   "${BIN_TOOL[@]}" -e prod framework:schema -s 'entity-schema' "${SCHEMA_FILE}"
+  sync_ddev_files
   (cd "${ADMIN_ROOT}"/Resources/app/administration && npm run convert-entity-schema)
 fi
 
 (cd "${ADMIN_ROOT}"/Resources/app/administration && rm -rdf public/bundles && npm run build)
+sync_ddev_files
 [[ ${SHOPWARE_SKIP_ASSET_COPY:-""} ]] || "${BIN_TOOL[@]}" assets:install
